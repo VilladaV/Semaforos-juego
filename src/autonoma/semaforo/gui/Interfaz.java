@@ -16,21 +16,21 @@ public class Interfaz extends JPanel  {
     private String escenario = "Crucero.png";
     ImageIcon image_icon1;
 
-    private String carrox1="carrox1.png";
+    private String carrox1="imagenes/carrox1.png";
     ImageIcon image_icon2;
-    private String carrox2="carrox2.png";
+    private String carrox2="imagenes/carrox2.png";
     ImageIcon image_icon3;
-    private String carroxi1="carroxi1.png";
+    private String carroxi1="imagenes/carroxi1.png";
     ImageIcon image_icon4;
-    private String carroxi2="carroxi2.png";
+    private String carroxi2="imagenes/carroxi2.png";
     ImageIcon image_icon5;
-    private String carroy1="carroy1.png";
+    private String carroy1="imagenes/carroy1.png";
     ImageIcon image_icon6;
-    private String carroy2="carroy2.png";
+    private String carroy2="imagenes/carroy2.png";
     ImageIcon image_icon7;
-    private String carroya1="carroya1.png";
+    private String carroya1="imagenes/carroya1.png";
     ImageIcon image_icon8;
-    private String carroya2="carroya2.png";
+    private String carroya2="imagenes/carroya2.png";
     ImageIcon image_icon9;
 
     public int x1,x2,xi1,xi2;
