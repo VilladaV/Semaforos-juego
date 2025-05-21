@@ -6,7 +6,7 @@ package autonoma.semaforo.gui;
 
 /**
  *
- * @author PABLO VI
+ * @author PABLO VI..
  */
 import java.awt.*;
 import javax.swing.*;
