@@ -6,27 +6,36 @@ package autonoma.semaforo.main;
 
 /**
  *
- * @author PABLO VI
+ * @author johan villada yu camila prada 
+ * version 1.0.0
+ * 3/24/25
  */
 import autonoma.semaforo.gui.Interfaz;
 import autonoma.semaforo.models.ListaCarros;
+import java.awt.BorderLayout;
 import javax.swing.*;
 
 public class Main extends JFrame {
+    public static ListaCarros LisCarr;
 
-	public Main() {
- 		add(new Interfaz());
- 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
- 		setSize(400,300);
- 		setLocationRelativeTo(null);
- 		setTitle("Practica 1");
- 		setResizable(false);
- 		setVisible(true);
- 	}
+    public Main() {
+        Interfaz interfaz = new Interfaz();
+        add(interfaz);
+        JPanel panel = new JPanel();
 
- 	public static void main(String[] args) {
- 		new Main();
-		ListaCarros LisCarr = new ListaCarros();
-		LisCarr.start();
- 	}
+        add(panel, BorderLayout.SOUTH);
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1080, 720);
+        setLocationRelativeTo(null);
+        setTitle("Practica 1");
+        setResizable(false);
+        setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        LisCarr = new ListaCarros();
+        new Main();
+        LisCarr.start();
+    }
 }

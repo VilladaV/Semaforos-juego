@@ -4,93 +4,73 @@
  */
 package autonoma.semaforo.models;
 
-/**
- *
- * @author PABLO VI
- */
-import java.util.*;
+import java.util.Random;
 
 public class ListaCarros extends Thread {
 
-	public int CarrilA,CarrilB,CarrilC,CarrilD;
-	public boolean SemAB,SemCD;
-	public Random Rand = new Random();
-   
-	public void run() {
-   
-	int a,b,c,d;
-	boolean iniciar = true;
-	
-	try {
+    public boolean semaforoABVerde = true; // true = AB verde, CD rojo; false = AB rojo, CD verde
+    private Random rand = new Random();
 
-		Sistema CtrlSem = new Sistema();
-		CtrlSem.start();
+    // Variables que indican si los carros de un carril se están moviendo
+    private boolean carrilAMoviendose = true;
+    private boolean carrilBMoviendose = true;
+    private boolean carrilCMoviendose = false;
+    private boolean carrilDMoviendose = false;
 
-		while(true) {
+    // Puedes agregar más variables para controlar la "velocidad" o "densidad" si quieres simular eso
+    // ...
 
-			if(iniciar == true) {
+    @Override
+    public void run() {
+        while (true) {
+            // Lógica para decidir qué carriles se mueven
+            if (semaforoABVerde) {
+                carrilAMoviendose = true;
+                carrilBMoviendose = true;
+                carrilCMoviendose = false; // Detenidos
+                carrilDMoviendose = false; // Detenidos
+            } else {
+                carrilAMoviendose = false; // Detenidos
+                carrilBMoviendose = false; // Detenidos
+                carrilCMoviendose = true;
+                carrilDMoviendose = true;
+            }
 
-				a = ( ( Rand.nextInt(10000) % 13) + 1);
-				CarrilA = CarrilA + a;
-				if (CarrilA < 0) { CarrilA = 0; }
-				b = ( ( Rand.nextInt(10000) % 13) + 1);
-				CarrilB = CarrilB + b;
-				if (CarrilB < 0) { CarrilB = 0; }
-				c = ( ( Rand.nextInt(10000) % 10) + 1);
-				CarrilC = CarrilC + c;
-				if (CarrilC < 0) { CarrilC = 0; }
-				d = ( ( Rand.nextInt(10000) % 10) + 1);
-				CarrilD = CarrilD + d;
-				if (CarrilD < 0) { CarrilD = 0; }
-			}
-			else {
-			
-				if (SemAB == true) {
+            // Aquí agregar lógica para la densidad de carros,
+            // por ejemplo, generando nuevos carros o quitándolos
+            // CarrilA += rand.nextInt(5);
+            // ...
 
-            	   		    CarrilA=CarrilA-3;
-				    CarrilB=CarrilB-2;
-				if (CarrilA < 0) { CarrilA = 0; }
-				if (CarrilB < 0) { CarrilB = 0; }
-				
-            	    	            CarrilC=CarrilC+5;
-			            CarrilD=CarrilD+5;
-				
-				} else {
-
-            	    	            CarrilC=CarrilC-2;
-				    CarrilD=CarrilD-2;
-				
-                                    if (CarrilC < 0) { CarrilC = 0; }
-				    if (CarrilD < 0) { CarrilD = 0; }
-
-					
-            	    	            CarrilA=CarrilA+3;
-				    CarrilB=CarrilB+3;		
-				}
-			}
-		
-		iniciar = false;
-		
-		CtrlSem.setCarros(CarrilA,CarrilB,CarrilC,CarrilD);
-		CarrilA = 0;
-		CarrilB = 0;
-		CarrilC = 0;
-		CarrilD = 0;
-
-		Thread.sleep(5000);
-
-	
-	} //Fin del wile
-	
-	} catch(InterruptedException e){ 
-		System.out.println("Excepcion: " + e.getMessage());
-	}
-
-    } //fin del metodo run()
-
-    public void setEstado(boolean SAB,boolean SCD) {
-		SemAB = SAB;
-		SemCD = SCD;
+            try {
+                // Hacemos que este hilo "duerma" un poco para no consumir CPU inútilmente
+                // y permitir que el Timer de la GUI tenga tiempo de reaccionar.
+                Thread.sleep(100); //
+            } catch (InterruptedException e) {
+                System.out.println("Excepción en ListaCarros: " + e.getMessage());
+                break; // Salir del bucle si el hilo es interrumpido
+            }
+        }
     }
-   
-} //Fin de la clase ListaCarros
+
+    // Métodos para que la Interfaz pregunte el estado de movimiento
+    public boolean isCarrilAMoviendose() {
+        return carrilAMoviendose;
+    }
+
+    public boolean isCarrilBMoviendose() {
+        return carrilBMoviendose;
+    }
+
+    public boolean isCarrilCMoviendose() {
+        return carrilCMoviendose;
+    }
+
+    public boolean isCarrilDMoviendose() {
+        return carrilDMoviendose;
+    }
+
+    // Método para cambiar el estado del semáforo desde la GUI
+    public void setSemaforoABVerde(boolean estado) {
+        this.semaforoABVerde = estado;
+    }
+}
