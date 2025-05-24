@@ -3,14 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package autonoma.semaforo.gui;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JButton;
 import java.awt.*;
 import javax.swing.*;
 
 import autonoma.semaforo.models.ListaCarros; // Importamos nuestra clase de lógica
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Interfaz extends JPanel implements ActionListener {
     private JButton botonAB, botonCD;
