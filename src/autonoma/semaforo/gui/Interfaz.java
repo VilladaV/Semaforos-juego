@@ -6,6 +6,7 @@ package autonoma.semaforo.gui;
 import java.awt.*;
 import javax.swing.*;
 
+//
 import autonoma.semaforo.models.ListaCarros; // Importamos nuestra clase de lógica
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
