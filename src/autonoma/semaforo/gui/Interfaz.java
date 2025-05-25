@@ -87,49 +87,49 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (logicaCarros.isCarrilDMoviendose()) {
-            x1++;
-            x2++;
-            if (x1 > getWidth()) x1 = -image_icon2.getIconWidth();
-            if (x2 > getWidth()) x2 = -image_icon3.getIconWidth();
-        } else {
-            if (x1 < SEMAFORO_X_PARADA_IZQ) x1 = SEMAFORO_X_PARADA_IZQ;
-            if (x2 < SEMAFORO_X_PARADA_IZQ) x2 = SEMAFORO_X_PARADA_IZQ;
-        }
-
-        if (logicaCarros.isCarrilCMoviendose()) {
-            xi1--;
-            xi2--;
-            if (xi1 < -image_icon4.getIconWidth()) xi1 = getWidth();
-            if (xi2 < -image_icon5.getIconWidth()) xi2 = getWidth();
-        } else {
-            if (xi1 > SEMAFORO_X_PARADA_DER) xi1 = SEMAFORO_X_PARADA_DER;
-            if (xi2 > SEMAFORO_X_PARADA_DER) xi2 = SEMAFORO_X_PARADA_DER;
-        }
-
-        if (logicaCarros.isCarrilAMoviendose()) {
-            y1++;
-            y2++;
-            if (y1 > getHeight()) y1 = -image_icon6.getIconHeight();
-            if (y2 > getHeight()) y2 = -image_icon7.getIconHeight();
-        } else {
-            if (y1 < SEMAFORO_Y_PARADA_ARRIBA) y1 = SEMAFORO_Y_PARADA_ARRIBA;
-            if (y2 < SEMAFORO_Y_PARADA_ARRIBA) y2 = SEMAFORO_Y_PARADA_ARRIBA;
-        }
-
-        if (logicaCarros.isCarrilBMoviendose()) {
-            ya1--;
-            ya2--;
-            if (ya1 < -image_icon8.getIconHeight()) ya1 = getHeight();
-            if (ya2 < -image_icon9.getIconHeight()) ya2 = getHeight();
-        } else {
-            if (ya1 > SEMAFORO_Y_PARADA_ABAJO) ya1 = SEMAFORO_Y_PARADA_ABAJO;
-            if (ya2 > SEMAFORO_Y_PARADA_ABAJO) ya2 = SEMAFORO_Y_PARADA_ABAJO;
-        }
-
-        repaint();
+public void actionPerformed(ActionEvent e) {
+    // CARRIL D (izquierda a derecha)
+    if (logicaCarros.isCarrilDMoviendose() || x1 + image_icon2.getIconWidth() < SEMAFORO_X_PARADA_IZQ) {
+        x1++;
     }
+    if (logicaCarros.isCarrilDMoviendose() || x2 + image_icon3.getIconWidth() < SEMAFORO_X_PARADA_IZQ) {
+        x2++;
+    }
+    if (x1 > getWidth()) x1 = -image_icon2.getIconWidth();
+    if (x2 > getWidth()) x2 = -image_icon3.getIconWidth();
+
+    // CARRIL C (derecha a izquierda)
+    if (logicaCarros.isCarrilCMoviendose() || xi1 > SEMAFORO_X_PARADA_DER) {
+        xi1--;
+    }
+    if (logicaCarros.isCarrilCMoviendose() || xi2 > SEMAFORO_X_PARADA_DER) {
+        xi2--;
+    }
+    if (xi1 < -image_icon4.getIconWidth()) xi1 = getWidth();
+    if (xi2 < -image_icon5.getIconWidth()) xi2 = getWidth();
+
+    // CARRIL A (arriba hacia abajo)
+    if (logicaCarros.isCarrilAMoviendose() || y1 + image_icon6.getIconHeight() < SEMAFORO_Y_PARADA_ARRIBA) {
+        y1++;
+    }
+    if (logicaCarros.isCarrilAMoviendose() || y2 + image_icon7.getIconHeight() < SEMAFORO_Y_PARADA_ARRIBA) {
+        y2++;
+    }
+    if (y1 > getHeight()) y1 = -image_icon6.getIconHeight();
+    if (y2 > getHeight()) y2 = -image_icon7.getIconHeight();
+
+    // CARRIL B (abajo hacia arriba)
+    if (logicaCarros.isCarrilBMoviendose() || ya1 > SEMAFORO_Y_PARADA_ABAJO) {
+        ya1--;
+    }
+    if (logicaCarros.isCarrilBMoviendose() || ya2 > SEMAFORO_Y_PARADA_ABAJO) {
+        ya2--;
+    }
+    if (ya1 < -image_icon8.getIconHeight()) ya1 = getHeight();
+    if (ya2 < -image_icon9.getIconHeight()) ya2 = getHeight();
+
+    repaint();
+}
 
     @Override
     public void paintComponent(Graphics g) {
@@ -150,23 +150,28 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
         // Mostrar texto en pantalla
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 20));
-        String estado = logicaCarros.isCarrilAMoviendose() ? "Semáforo A-B VERDE" : "Semáforo C-D VERDE";
-        g2d.drawString("Estado semáforo: " + estado, 20, 40);
+        String estadoAB = logicaCarros.isSemaforoABVerde() ? "VERDE" : "ROJO";
+        String estadoCD = logicaCarros.isSemaforoCDVerde() ? "VERDE" : "ROJO";
+        g2d.drawString("Semáforo A-B: " + estadoAB + " | C-D: " + estadoCD, 20, 40);
+
 
         Toolkit.getDefaultToolkit().sync();
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        int tecla = e.getKeyCode();
-        if (tecla == KeyEvent.VK_A) {
-            logicaCarros.setSemaforoABVerde(true);
-            System.out.println("🔄 Cambiaste a Semáforo A-B VERDE");
-        } else if (tecla == KeyEvent.VK_C) {
-            logicaCarros.setSemaforoABVerde(false);
-            System.out.println("🔄 Cambiaste a Semáforo C-D VERDE");
-        }
+public void keyPressed(KeyEvent e) {
+    int tecla = e.getKeyCode();
+    if (tecla == KeyEvent.VK_A) {
+        boolean nuevoEstado = !logicaCarros.isSemaforoABVerde();
+        logicaCarros.setSemaforoABVerde(nuevoEstado);
+        System.out.println("🔄 Cambiaste Semáforo A-B a " + (nuevoEstado ? "VERDE" : "ROJO"));
+    } else if (tecla == KeyEvent.VK_C) {
+        boolean nuevoEstado = !logicaCarros.isSemaforoCDVerde();
+        logicaCarros.setSemaforoCDVerde(nuevoEstado);
+        System.out.println("🔄 Cambiaste Semáforo C-D a " + (nuevoEstado ? "VERDE" : "ROJO"));
     }
+}
+
 
     @Override
     public void keyReleased(KeyEvent e) {}
