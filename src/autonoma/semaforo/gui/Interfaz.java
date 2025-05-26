@@ -1,3 +1,4 @@
+// Archivo: Interfaz.java
 package autonoma.semaforo.gui;
 
 import autonoma.semaforo.excepciones.ChoqueException;
@@ -13,34 +14,15 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-/**
- * Clase que representa la interfaz grafica del simulador de semaforo y carros.
- * Extiende {@code JPanel} e implementa {@code ActionListener} y {@code KeyListener}
- * para gestionar el renderizado gráfico, movimiento de los carros y entrada del teclado.
- * 
- * <p>Permite visualizar un cruce de caminos con semáforos, donde los carros avanzan
- * dependiendo del estado de los semáforos controlados por el usuario.</p>
- * 
- * <p>Teclas habilitadas:
- * <ul>
- *   <li>A: Cambia el estado del semáforo A-B</li>
- *   <li>C: Cambia el estado del semáforo C-D</li>
- * </ul></p>
- * 
- * @author: Jhoan Andres Villada - Juan Esteban Giraldo Betancur - Isabela Quintero Murillo
- */
-
-public abstract class Interfaz extends JPanel implements ActionListener, KeyListener {
-     // Imágenes de fondo y carros
+public class Interfaz extends JPanel implements ActionListener, KeyListener {
     private ImageIcon image_icon1;
     private ImageIcon image_icon2, image_icon3, image_icon4, image_icon5, image_icon6, image_icon7, image_icon8, image_icon9;
-    
-     // Posiciones de parada según la ubicacion del semaforo
+
     private final int SEMAFORO_X_PARADA_IZQ = 400;
     private final int SEMAFORO_X_PARADA_DER = 675;
     private final int SEMAFORO_Y_PARADA_ARRIBA = 270;
     private final int SEMAFORO_Y_PARADA_ABAJO = 520;
-    
+
     private Timer timer;
     private Timer generadorCarros;
     private ListaCarros logicaCarros;
@@ -52,16 +34,11 @@ public abstract class Interfaz extends JPanel implements ActionListener, KeyList
     private Timer timerPuntaje;
     private static final String ARCHIVO_PUNTAJE = "mejor_puntaje.txt";
 
-    /**
-     * Constructor que inicializa la interfaz gráfica, carga las imagenes, 
-     * configura los carros y activa el temporizador de actualización.
-     */
-    
     public Interfaz(int nivelDificultad, ListaCarros logicaCarros) {
         this.nivelDificultad = nivelDificultad;
         this.logicaCarros = logicaCarros;
         this.rand = new Random();
-        
+
         setFocusable(true);
         setBackground(Color.BLACK);
         setDoubleBuffered(true);
@@ -69,158 +46,117 @@ public abstract class Interfaz extends JPanel implements ActionListener, KeyList
         carros = new ArrayList<>();
         configurarImagenes();
         configurarTemporizadores();
-        
+
         addKeyListener(this);
         requestFocusInWindow();
-        
+
         this.puntaje = 0;
         this.mejorPuntaje = cargarMejorPuntaje();
         iniciarTimerPuntaje();
     }
-    // Carga de imágenes
+
     private void configurarImagenes() {
         image_icon1 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/crucero.png"));
-image_icon2 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carrox1.png"));
-image_icon3 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carrox2.png"));
-image_icon4 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroxi1.png"));
-image_icon5 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroxi2.png"));
-image_icon6 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroy1.png"));
-image_icon7 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroy2.png"));
-image_icon8 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroya1.png"));
-image_icon9 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroya2.png"));
-
+        image_icon2 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carrox1.png"));
+        image_icon3 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carrox2.png"));
+        image_icon4 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroxi1.png"));
+        image_icon5 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroxi2.png"));
+        image_icon6 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroy1.png"));
+        image_icon7 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroy2.png"));
+        image_icon8 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroya1.png"));
+        image_icon9 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroya2.png"));
     }
 
     private void configurarTemporizadores() {
         timer = new Timer(10, this);
         timer.start();
-        
-        int frecuenciaGeneracion = switch(nivelDificultad) {
-            case 1 -> 5000; // Fácil
-            case 2 -> 3000; // Medio
-            case 3 -> 1500; // Difícil
+
+        int frecuenciaGeneracion = switch (nivelDificultad) {
+            case 1 -> 5000;
+            case 2 -> 3000;
+            case 3 -> 1500;
             default -> 3000;
         };
-        
+
         generadorCarros = new Timer(frecuenciaGeneracion, e -> generarNuevoCarro());
         generadorCarros.start();
     }
 
     private void generarNuevoCarro() {
-    int tipoCarro = rand.nextInt(4);
-    Carro nuevoCarro = null;
-    boolean posicionValida = false;
-    int intentos = 0;
-    
-    while(!posicionValida && intentos < 20) { // Aumentamos intentos
-        intentos++;
-        
-        switch(tipoCarro) {
-            case 0: // Horizontal positivo (D)
-                nuevoCarro = new Carro(
-                    -100 - rand.nextInt(200), // Aleatorizar posición inicial
-                    380 + rand.nextInt(50), 
-                    Carro.Direccion.HORIZONTAL, 
-                    Carro.Sentido.POSITIVO, 
-                    rand.nextBoolean() ? image_icon2 : image_icon3, 
-                    SEMAFORO_X_PARADA_IZQ, "D");
-                break;
-                case 1: // Horizontal negativo (C)
-                    nuevoCarro = new Carro(1180, 325 + rand.nextInt(50), 
-                        Carro.Direccion.HORIZONTAL, Carro.Sentido.NEGATIVO, 
-                        rand.nextBoolean() ? image_icon4 : image_icon5, 
-                        SEMAFORO_X_PARADA_DER, "C");
-                    break;
-                case 2: // Vertical positivo (A)
-                    nuevoCarro = new Carro(454 + rand.nextInt(50), -100, 
-                        Carro.Direccion.VERTICAL, Carro.Sentido.POSITIVO, 
-                        rand.nextBoolean() ? image_icon6 : image_icon7, 
-                        SEMAFORO_Y_PARADA_ARRIBA, "A");
-                    break;
-                case 3: // Vertical negativo (B)
-                    nuevoCarro = new Carro(555 + rand.nextInt(50), 820, 
-                        Carro.Direccion.VERTICAL, Carro.Sentido.NEGATIVO, 
-                        rand.nextBoolean() ? image_icon8 : image_icon9, 
-                        SEMAFORO_Y_PARADA_ABAJO, "B");
-                    break;
+        int tipoCarro = rand.nextInt(4);
+        Carro nuevoCarro = null;
+        boolean posicionValida = false;
+        int intentos = 0;
+
+        while (!posicionValida && intentos < 20) {
+            intentos++;
+
+            switch (tipoCarro) {
+                case 0 -> nuevoCarro = new Carro(-100 - rand.nextInt(200), 380 + rand.nextInt(50), Carro.Direccion.HORIZONTAL, Carro.Sentido.POSITIVO, rand.nextBoolean() ? image_icon2 : image_icon3, SEMAFORO_X_PARADA_IZQ, "D");
+                case 1 -> nuevoCarro = new Carro(1180, 325 + rand.nextInt(50), Carro.Direccion.HORIZONTAL, Carro.Sentido.NEGATIVO, rand.nextBoolean() ? image_icon4 : image_icon5, SEMAFORO_X_PARADA_DER, "C");
+                case 2 -> nuevoCarro = new Carro(454 + rand.nextInt(50), -100, Carro.Direccion.VERTICAL, Carro.Sentido.POSITIVO, rand.nextBoolean() ? image_icon6 : image_icon7, SEMAFORO_Y_PARADA_ARRIBA, "A");
+                case 3 -> nuevoCarro = new Carro(555 + rand.nextInt(50), 820, Carro.Direccion.VERTICAL, Carro.Sentido.NEGATIVO, rand.nextBoolean() ? image_icon8 : image_icon9, SEMAFORO_Y_PARADA_ABAJO, "B");
             }
-            
-             posicionValida = true;
-        for(Carro existente : carros) {
-            if(nuevoCarro != null && nuevoCarro.getBounds().intersects(existente.getBounds())) {
-                posicionValida = false;
-                break;
-            }
-        }
-    }
-    
-    if(posicionValida && nuevoCarro != null) {
-        carros.add(nuevoCarro);
-    }
-}
-private boolean verificarColisionesEnCruce() throws ChoqueException {
-    Rectangle areaCruce = new Rectangle(400, 270, 275, 250);
-    
-    for (int i = 0; i < carros.size(); i++) {
-        for (int j = i + 1; j < carros.size(); j++) {
-            Carro carro1 = carros.get(i);
-            Carro carro2 = carros.get(j);
-            
-            if (carro1.getDireccion() != carro2.getDireccion()) {
-                Rectangle bounds1 = carro1.getBounds();
-                Rectangle bounds2 = carro2.getBounds();
-                
-                if (areaCruce.contains(bounds1) && 
-                    areaCruce.contains(bounds2) && 
-                    bounds1.intersects(bounds2)) {
-                    throw new ChoqueException(carro1.getCarril(), carro2.getCarril());
+
+            posicionValida = true;
+            for (Carro existente : carros) {
+                if (nuevoCarro != null && nuevoCarro.getBounds().intersects(existente.getBounds())) {
+                    posicionValida = false;
+                    break;
                 }
             }
         }
-    }
-    return false;
-}
-        /**
-     * Metodo que se ejecuta cada vez que el temporizador se activa.
-     * Actualiza la posicion de todos los carros dependiendo del estado de los semaforos.
-     * 
-     * @param e el evento generado por el temporizador
-     */
-    @Override
-public void actionPerformed(ActionEvent e) {
-    boolean abVerde = logicaCarros.isSemaforoABVerde();
-    boolean cdVerde = logicaCarros.isSemaforoCDVerde();
-    
-    try {
-        for (Carro carro : carros) {
-            boolean semaforoVerde;
-            
-            switch(carro.getCarril()) {
-                case "A":
-                case "B":
-                    semaforoVerde = abVerde;
-                    break;
-                case "C":
-                case "D":
-                    semaforoVerde = cdVerde;
-                    break;
-                default:
-                    semaforoVerde = false;
-            }
-            
-            carro.mover(semaforoVerde, carros);
-            carro.reiniciarSiSale(getWidth(), getHeight());
-        }
-        
-        verificarColisionesEnCruce();
-    } catch (ChoqueException ex) {
-        terminarJuego();
-    }
-    
-    repaint();
-}
 
-private void iniciarTimerPuntaje() {
+        if (posicionValida && nuevoCarro != null) {
+            carros.add(nuevoCarro);
+        }
+    }
+
+    private boolean verificarColisionesEnCruce() throws ChoqueException {
+        Rectangle areaCruce = new Rectangle(400, 270, 275, 250);
+
+        for (int i = 0; i < carros.size(); i++) {
+            for (int j = i + 1; j < carros.size(); j++) {
+                Carro carro1 = carros.get(i);
+                Carro carro2 = carros.get(j);
+
+                if (carro1.getDireccion() != carro2.getDireccion()) {
+                    if (areaCruce.contains(carro1.getBounds()) &&
+                        areaCruce.contains(carro2.getBounds()) &&
+                        carro1.getBounds().intersects(carro2.getBounds())) {
+                        throw new ChoqueException(carro1.getCarril(), carro2.getCarril());
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        boolean abVerde = logicaCarros.isSemaforoABVerde();
+        boolean cdVerde = logicaCarros.isSemaforoCDVerde();
+
+        try {
+            for (Carro carro : carros) {
+                boolean semaforoVerde = switch (carro.getCarril()) {
+                    case "A", "B" -> abVerde;
+                    case "C", "D" -> cdVerde;
+                    default -> false;
+                };
+
+                carro.mover(semaforoVerde, carros);
+                carro.reiniciarSiSale(getWidth(), getHeight());
+            }
+            verificarColisionesEnCruce();
+        } catch (ChoqueException ex) {
+            terminarJuego();
+        }
+
+        repaint();
+    }
+
+    private void iniciarTimerPuntaje() {
         timerPuntaje = new Timer(1000, e -> {
             puntaje += 2;
             repaint();
@@ -229,48 +165,32 @@ private void iniciarTimerPuntaje() {
     }
 
     private int cargarMejorPuntaje() {
-        try {
-            File archivo = new File(ARCHIVO_PUNTAJE);
-            if (archivo.exists()) {
-                Scanner scanner = new Scanner(archivo);
-                int puntaje = scanner.nextInt();
-                scanner.close();
-                return puntaje;
-            }
+        try (Scanner s = new Scanner(new File(ARCHIVO_PUNTAJE))) {
+            return s.hasNextInt() ? s.nextInt() : 0;
         } catch (Exception e) {
-            System.err.println("Error al leer el archivo de puntaje: " + e.getMessage());
+            return 0;
         }
-        return 0;
     }
 
     private void guardarMejorPuntaje() {
-        try (PrintWriter writer = new PrintWriter(ARCHIVO_PUNTAJE)) {
-            writer.print(mejorPuntaje);
-        } catch (Exception e) {
-            System.err.println("Error al guardar el puntaje: " + e.getMessage());
-        }
+        try (PrintWriter w = new PrintWriter(ARCHIVO_PUNTAJE)) {
+            w.print(mejorPuntaje);
+        } catch (Exception ignored) {}
     }
 
     private void terminarJuego() {
         timer.stop();
         generadorCarros.stop();
         timerPuntaje.stop();
-        
+
         if (puntaje > mejorPuntaje) {
             mejorPuntaje = puntaje;
             guardarMejorPuntaje();
         }
-        
-        try {
-            throw new ChoqueException("Carril A-B", "Carril C-D");
-        } catch (ChoqueException e) {
-            JOptionPane.showMessageDialog(this,
-                e.getMessage() + "\nPuntaje: " + puntaje + 
-                "\nMejor puntaje: " + mejorPuntaje,
-                "Fin del juego",
-                JOptionPane.ERROR_MESSAGE);
-        }
-        
+
+        JOptionPane.showMessageDialog(this, "¡Colisión!\nPuntaje: " + puntaje +
+                "\nMejor puntaje: " + mejorPuntaje, "Fin del juego", JOptionPane.ERROR_MESSAGE);
+
         reiniciarJuego();
     }
 
@@ -280,92 +200,50 @@ private void iniciarTimerPuntaje() {
         timer.start();
         generadorCarros.start();
         timerPuntaje.start();
-        setFocusable(true);
         requestFocusInWindow();
     }
 
-      /**
-     * Dibuja los elementos graficos en pantalla: fondo, carros y texto informativo.
-     * 
-     * @param g el contexto grafico donde se realiza el dibujo
-     */
     @Override
-public void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    Graphics2D g2d = (Graphics2D)g;
-    
-    // Dibujar fondo
-    g2d.drawImage(image_icon1.getImage(), 0, 0, this);
-    
-//    // Dibujar área de colisión (solo para depuración)
-//    g2d.setColor(new Color(255, 0, 0, 50)); // Rojo semitransparente
-//    g2d.fillRect(440, 320, 190, 180);
-    
-    // Dibujar semáforos
-    dibujarSemaforo(g2d, 450, 250, logicaCarros.isSemaforoABVerde()); // AB
-    dibujarSemaforo(g2d, 650, 500, logicaCarros.isSemaforoCDVerde()); // CD
-    
-    // Dibujar autos
-    for(Carro carro : carros) {
-        g2d.drawImage(carro.getImagen().getImage(), carro.getX(), carro.getY(), this);
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+
+        g2d.drawImage(image_icon1.getImage(), 0, 0, this);
+        dibujarSemaforo(g2d, 450, 250, logicaCarros.isSemaforoABVerde());
+        dibujarSemaforo(g2d, 650, 500, logicaCarros.isSemaforoCDVerde());
+
+        for (Carro carro : carros) {
+            g2d.drawImage(carro.getImagen().getImage(), carro.getX(), carro.getY(), this);
+        }
+
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Arial", Font.BOLD, 20));
+        g2d.drawString("Puntaje: " + puntaje, 20, 120);
+        g2d.drawString("Mejor: " + mejorPuntaje, 20, 150);
+        g2d.drawString("Semáforo AB (A): " + (logicaCarros.isSemaforoABVerde() ? "Verde" : "Rojo"), 20, 30);
+        g2d.drawString("Semáforo CD (C): " + (logicaCarros.isSemaforoCDVerde() ? "Verde" : "Rojo"), 20, 60);
+        g2d.drawString("Nivel: " + (nivelDificultad == 3 ? "😈 Caos" : nivelDificultad == 2 ? "Medio" : "Fácil"), 20, 90);
     }
-    
-    g2d.setColor(Color.WHITE);
-    g2d.setFont(new Font("Arial", Font.BOLD, 20));
-    g2d.drawString("Puntaje: " + puntaje, 20, 120);
-    g2d.drawString("Mejor: " + mejorPuntaje, 20, 150);
-    
-    // Dibujar información
-    g2d.setColor(Color.WHITE);
-    g2d.setFont(new Font("Arial", Font.BOLD, 20));
-    g2d.drawString("Semaforo AB (Tecla A): " + (logicaCarros.isSemaforoABVerde() ? "VERDE" : "ROJO"), 20, 30);
-    g2d.drawString("Semaforo CD (Tecla C): " + (logicaCarros.isSemaforoCDVerde() ? "VERDE" : "ROJO"), 20, 60);
-    g2d.drawString("Nivel: " + (nivelDificultad == 1 ? "FÁCIL" : nivelDificultad == 2 ? "MEDIO" : "DIFÍCIL"), 20, 90);
-}
 
-private void dibujarSemaforo(Graphics2D g2d, int x, int y, boolean verde) {
-    g2d.setColor(Color.BLACK);
-    g2d.fillRect(x, y, 30, 60);
-    g2d.setColor(verde ? Color.GREEN : Color.RED);
-    g2d.fillOval(x+5, y+5, 20, 20);
-    g2d.setColor(verde ? Color.RED : Color.GREEN);
-    g2d.fillOval(x+5, y+35, 20, 20);
-}
-     /**
-     * Maneja las teclas presionadas. 
-     * Tecla A cambia el estado del semáforo A-B.
-     * Tecla C cambia el estado del semáforo C-D.
-     *
-     * @param e evento de teclado
-     */
-    @Override
-public void keyPressed(KeyEvent e) {
-     if (e.getKeyCode() == KeyEvent.VK_R) {
-        reiniciarJuego();
+    private void dibujarSemaforo(Graphics2D g2d, int x, int y, boolean verde) {
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(x, y, 30, 60);
+        g2d.setColor(verde ? Color.GREEN : Color.RED);
+        g2d.fillOval(x + 5, y + 5, 20, 20);
+        g2d.setColor(verde ? Color.RED : Color.GREEN);
+        g2d.fillOval(x + 5, y + 35, 20, 20);
     }
-    if(e.getKeyCode() == KeyEvent.VK_A) {
-        boolean nuevoEstado = !logicaCarros.isSemaforoABVerde();
-        logicaCarros.setSemaforoABVerde(nuevoEstado);
-        System.out.println("Semaforo AB: " + (nuevoEstado ? "VERDE" : "ROJO"));
-    } 
-    else if(e.getKeyCode() == KeyEvent.VK_C) {
-        boolean nuevoEstado = !logicaCarros.isSemaforoCDVerde();
-        logicaCarros.setSemaforoCDVerde(nuevoEstado);
-        System.out.println("Semaforo CD: " + (nuevoEstado ? "VERDE" : "ROJO"));
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_A -> logicaCarros.setSemaforoABVerde(!logicaCarros.isSemaforoABVerde());
+            case KeyEvent.VK_C -> logicaCarros.setSemaforoCDVerde(!logicaCarros.isSemaforoCDVerde());
+            case KeyEvent.VK_R -> reiniciarJuego();
+        }
+        repaint();
     }
-    repaint(); // Forzar redibujado inmediato
+
+    @Override public void keyTyped(KeyEvent e) {}
+    @Override public void keyReleased(KeyEvent e) {}
 }
-    
-
-    @Override
-    public void keyReleased(KeyEvent e) {}
-    @Override
-    public void keyTyped(KeyEvent e) {}
-
-    
-}  
-    
-   
-
-  
-
