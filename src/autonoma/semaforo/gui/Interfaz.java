@@ -9,10 +9,29 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Clase que representa la interfaz grafica del simulador de semaforo y carros.
+ * Extiende {@code JPanel} e implementa {@code ActionListener} y {@code KeyListener}
+ * para gestionar el renderizado gráfico, movimiento de los carros y entrada del teclado.
+ * 
+ * <p>Permite visualizar un cruce de caminos con semáforos, donde los carros avanzan
+ * dependiendo del estado de los semáforos controlados por el usuario.</p>
+ * 
+ * <p>Teclas habilitadas:
+ * <ul>
+ *   <li>A: Cambia el estado del semáforo A-B</li>
+ *   <li>C: Cambia el estado del semáforo C-D</li>
+ * </ul></p>
+ * 
+ * @author: Jhoan Andres Villada - Juan Esteban Giraldo Betancur - Isabela Quintero Murillo
+ */
+
 public class Interfaz extends JPanel implements ActionListener, KeyListener {
+     // Imágenes de fondo y carros
     private ImageIcon image_icon1;
     private ImageIcon image_icon2, image_icon3, image_icon4, image_icon5, image_icon6, image_icon7, image_icon8, image_icon9;
     
+     // Posiciones de parada según la ubicacion del semaforo
     private final int SEMAFORO_X_PARADA_IZQ = 400;
     private final int SEMAFORO_X_PARADA_DER = 675;
     private final int SEMAFORO_Y_PARADA_ARRIBA = 270;
@@ -25,6 +44,11 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
     private int nivelDificultad;
     private Random rand;
 
+    /**
+     * Constructor que inicializa la interfaz gráfica, carga las imagenes, 
+     * configura los carros y activa el temporizador de actualización.
+     */
+    
     public Interfaz(int nivelDificultad, ListaCarros logicaCarros) {
         this.nivelDificultad = nivelDificultad;
         this.logicaCarros = logicaCarros;
@@ -41,9 +65,9 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
         addKeyListener(this);
         requestFocusInWindow();
     }
-
+    // Carga de imágenes
     private void configurarImagenes() {
-        image_icon1 = new ImageIcon(getClass().getResource("imagenes/crucero.png"));
+        image_icon1 = new ImageIcon(getClass().getResource("imagenes/crucero2.jfif"));
         image_icon2 = new ImageIcon(getClass().getResource("imagenes/carrox1.png"));
         image_icon3 = new ImageIcon(getClass().getResource("imagenes/carrox2.png"));
         image_icon4 = new ImageIcon(getClass().getResource("imagenes/carroxi1.png"));
@@ -121,24 +145,46 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
         carros.add(nuevoCarro);
     }
 }
-
+        /**
+     * Metodo que se ejecuta cada vez que el temporizador se activa.
+     * Actualiza la posicion de todos los carros dependiendo del estado de los semaforos.
+     * 
+     * @param e el evento generado por el temporizador
+     */
     @Override
-    public void actionPerformed(ActionEvent e) {
-        for (Carro carro : carros) {
-            boolean semaforoVerde = switch (carro.getCarril()) {
-                case "A" -> logicaCarros.isCarrilAMoviendose();
-                case "B" -> logicaCarros.isCarrilBMoviendose();
-                case "C" -> logicaCarros.isCarrilCMoviendose();
-                case "D" -> logicaCarros.isCarrilDMoviendose();
-                default -> false;
-            };
-            
-            carro.mover(semaforoVerde, carros);
-            carro.reiniciarSiSale(getWidth(), getHeight());
+public void actionPerformed(ActionEvent e) {
+    // Obtener estados actuales de los semáforos una sola vez
+    boolean abVerde = logicaCarros.isSemaforoABVerde();
+    boolean cdVerde = logicaCarros.isSemaforoCDVerde();
+    
+    for (Carro carro : carros) {
+        boolean semaforoVerde;
+        
+        // Asignar correctamente el semáforo correspondiente
+        switch(carro.getCarril()) {
+            case "A":
+            case "B":
+                semaforoVerde = abVerde;
+                break;
+            case "C":
+            case "D":
+                semaforoVerde = cdVerde;
+                break;
+            default:
+                semaforoVerde = false;
         }
-        repaint();
+        
+        carro.mover(semaforoVerde, carros);
+        carro.reiniciarSiSale(getWidth(), getHeight());
     }
+    repaint();
+}
 
+      /**
+     * Dibuja los elementos graficos en pantalla: fondo, carros y texto informativo.
+     * 
+     * @param g el contexto grafico donde se realiza el dibujo
+     */
     @Override
 public void paintComponent(Graphics g) {
     super.paintComponent(g);
@@ -172,7 +218,13 @@ private void dibujarSemaforo(Graphics2D g2d, int x, int y, boolean verde) {
     g2d.setColor(verde ? Color.RED : Color.GREEN);
     g2d.fillOval(x+5, y+35, 20, 20);
 }
-
+     /**
+     * Maneja las teclas presionadas. 
+     * Tecla A cambia el estado del semáforo A-B.
+     * Tecla C cambia el estado del semáforo C-D.
+     *
+     * @param e evento de teclado
+     */
     @Override
 public void keyPressed(KeyEvent e) {
     if(e.getKeyCode() == KeyEvent.VK_A) {

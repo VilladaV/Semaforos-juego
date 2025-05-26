@@ -33,24 +33,41 @@ public class Carro {
     }
 
     public void mover(boolean semaforoEnVerde, List<Carro> todosLosCarros) {
-    // 1. Verificar si hay carro delante muy cerca (para evitar colisiones)
-    boolean carroDelanteCerca = false;
-    int distanciaSeguridad = 30; // Pixeles de separación mínima
+    // 1. Verificar si hay carro delante
+    boolean carroDelante = false;
+    int distanciaMinima = 50; // Distancia de seguridad
     
     for(Carro otro : todosLosCarros) {
-        if(otro != this && mismoCarrilYDireccion(otro)) {
-            int distancia = calcularDistanciaCon(otro);
-            
-            if(distancia < distanciaSeguridad && distancia > 0) {
-                carroDelanteCerca = true;
+        if(otro != this && mismoCarril(otro) && estaAdelante(otro)) {
+            int distancia = calcularDistancia(otro);
+            if(distancia < distanciaMinima) {
+                carroDelante = true;
                 break;
             }
         }
     }
     
-    // 2. Solo mover si no hay carro muy cerca delante
-    if(!carroDelanteCerca) {
-        boolean debeMover = determinarMovimiento(semaforoEnVerde);
+    // 2. Solo mover si no hay carro delante cerca
+    if(!carroDelante) {
+        boolean debeMover = false;
+        
+        // Lógica del semáforo
+        if(semaforoEnVerde) {
+            debeMover = true;
+            // Marcar que ya pasó el semáforo
+            if(estaEnSemaforo()) {
+                haPasadoSemaforo = true;
+            }
+        } else {
+            // Si el semáforo está en rojo
+            if(haPasadoSemaforo) {
+                debeMover = true; // Ya pasó, puede continuar
+            } else {
+                // Solo se mueve si no ha llegado al semáforo
+                debeMover = !estaEnSemaforo();
+            }
+        }
+        
         if(debeMover) {
             if(direccion == Direccion.HORIZONTAL) {
                 x += (sentido == Sentido.POSITIVO) ? 1 : -1;
@@ -61,69 +78,105 @@ public class Carro {
     }
 }
     
-    private boolean mismoCarrilYDireccion(Carro otro) {
-    return this.carril.equals(otro.getCarril()) && 
-           this.direccion == otro.direccion && 
-           this.sentido == otro.sentido;
+    private boolean mismoCarril(Carro otro) {
+    return this.carril.equals(otro.getCarril());
 }
 
-private int calcularDistanciaCon(Carro otro) {
+private boolean estaAdelante(Carro otro) {
     if(direccion == Direccion.HORIZONTAL) {
         if(sentido == Sentido.POSITIVO) {
-            return otro.getX() - (this.x + this.imagen.getIconWidth());
+            return otro.getX() > this.x;
         } else {
-            return this.x - (otro.getX() + otro.getImagen().getIconWidth());
+            return otro.getX() < this.x;
         }
     } else {
         if(sentido == Sentido.POSITIVO) {
-            return otro.getY() - (this.y + this.imagen.getIconHeight());
+            return otro.getY() > this.y;
         } else {
-            return this.y - (otro.getY() + otro.getImagen().getIconHeight());
+            return otro.getY() < this.y;
         }
     }
 }
 
-//    private int calcularDistancia(Carro otro) {
-//        if(direccion == Direccion.HORIZONTAL) {
-//            if(sentido == Sentido.POSITIVO && otro.getX() > this.x) {
-//                return otro.getX() - (this.x + this.imagen.getIconWidth());
-//            } else if(sentido == Sentido.NEGATIVO && otro.getX() < this.x) {
-//                return (this.x) - (otro.getX() + otro.getImagen().getIconWidth());
-//            }
-//        } else {
-//            if(sentido == Sentido.POSITIVO && otro.getY() > this.y) {
-//                return otro.getY() - (this.y + this.imagen.getIconHeight());
-//            } else if(sentido == Sentido.NEGATIVO && otro.getY() < this.y) {
-//                return (this.y) - (otro.getY() + otro.getImagen().getIconHeight());
-//            }
-//        }
-//        return Integer.MAX_VALUE;
-//    }
-
-    private boolean determinarMovimiento(boolean semaforoEnVerde) {
-        int frente = (direccion == Direccion.HORIZONTAL) ? 
-            (sentido == Sentido.POSITIVO ? x + imagen.getIconWidth() : x) :
-            (sentido == Sentido.POSITIVO ? y + imagen.getIconHeight() : y);
-
-        boolean estaCercaSemaforo = (direccion == Direccion.HORIZONTAL) ?
-            (sentido == Sentido.POSITIVO ? frente >= puntoParada - 10 && x < puntoParada + imagen.getIconWidth() + 10 :
-             frente <= puntoParada + 10 && x > puntoParada - imagen.getIconWidth() - 10) :
-            (sentido == Sentido.POSITIVO ? frente >= puntoParada - 10 && y < puntoParada + imagen.getIconHeight() + 10 :
-             frente <= puntoParada + 10 && y > puntoParada - imagen.getIconHeight() - 10);
-
-        if(semaforoEnVerde) {
-            if(estaCercaSemaforo) {
-                haPasadoSemaforo = true;
-            }
-            return true;
+private boolean estaEnSemaforo() {
+    if(direccion == Direccion.HORIZONTAL) {
+        if(sentido == Sentido.POSITIVO) {
+            return x + imagen.getIconWidth() >= puntoParada - 10 && x <= puntoParada + 10;
         } else {
-            if(haPasadoSemaforo) {
-                return true;
-            } else {
-                return !estaCercaSemaforo;
-            }
+            return x <= puntoParada + 10 && x >= puntoParada - 10;
+        }
+    } else {
+        if(sentido == Sentido.POSITIVO) {
+            return y + imagen.getIconHeight() >= puntoParada - 10 && y <= puntoParada + 10;
+        } else {
+            return y <= puntoParada + 10 && y >= puntoParada - 10;
         }
     }
+}
+    
+//private boolean mismoCarrilYDireccion(Carro otro) {
+//    return this.carril.equals(otro.getCarril()) && 
+//           this.direccion == otro.direccion && 
+//           this.sentido == otro.sentido;
+//}
+//
+//private int calcularDistanciaCon(Carro otro) {
+//    if(direccion == Direccion.HORIZONTAL) {
+//        if(sentido == Sentido.POSITIVO) {
+//            return otro.getX() - (this.x + this.imagen.getIconWidth());
+//        } else {
+//            return this.x - (otro.getX() + otro.getImagen().getIconWidth());
+//        }
+//    } else {
+//        if(sentido == Sentido.POSITIVO) {
+//            return otro.getY() - (this.y + this.imagen.getIconHeight());
+//        } else {
+//            return this.y - (otro.getY() + otro.getImagen().getIconHeight());
+//        }
+//    }
+//}
+
+    private int calcularDistancia(Carro otro) {
+        if(direccion == Direccion.HORIZONTAL) {
+            if(sentido == Sentido.POSITIVO && otro.getX() > this.x) {
+                return otro.getX() - (this.x + this.imagen.getIconWidth());
+            } else if(sentido == Sentido.NEGATIVO && otro.getX() < this.x) {
+                return (this.x) - (otro.getX() + otro.getImagen().getIconWidth());
+            }
+        } else {
+            if(sentido == Sentido.POSITIVO && otro.getY() > this.y) {
+                return otro.getY() - (this.y + this.imagen.getIconHeight());
+            } else if(sentido == Sentido.NEGATIVO && otro.getY() < this.y) {
+                return (this.y) - (otro.getY() + otro.getImagen().getIconHeight());
+            }
+        }
+        return Integer.MAX_VALUE;
+    }
+
+//    private boolean determinarMovimiento(boolean semaforoEnVerde) {
+//        int frente = (direccion == Direccion.HORIZONTAL) ? 
+//            (sentido == Sentido.POSITIVO ? x + imagen.getIconWidth() : x) :
+//            (sentido == Sentido.POSITIVO ? y + imagen.getIconHeight() : y);
+//
+//        boolean estaCercaSemaforo = (direccion == Direccion.HORIZONTAL) ?
+//            (sentido == Sentido.POSITIVO ? frente >= puntoParada - 10 && x < puntoParada + imagen.getIconWidth() + 10 :
+//             frente <= puntoParada + 10 && x > puntoParada - imagen.getIconWidth() - 10) :
+//            (sentido == Sentido.POSITIVO ? frente >= puntoParada - 10 && y < puntoParada + imagen.getIconHeight() + 10 :
+//             frente <= puntoParada + 10 && y > puntoParada - imagen.getIconHeight() - 10);
+//
+//        if(semaforoEnVerde) {
+//            if(estaCercaSemaforo) {
+//                haPasadoSemaforo = true;
+//            }
+//            return true;
+//        } else {
+//            if(haPasadoSemaforo) {
+//                return true;
+//            } else {
+//                return !estaCercaSemaforo;
+//            }
+//        }
+//    }
 
     public boolean estaDetenido() {
         int frente = (direccion == Direccion.HORIZONTAL) ? 

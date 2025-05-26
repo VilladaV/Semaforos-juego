@@ -1,5 +1,16 @@
 package autonoma.semaforo.models;
 
+/**
+ * Clase que simula el comportamiento de los carros en una intersección con semáforo.
+ * Se utiliza un hilo que actualiza constantemente el estado de movimiento de los carros
+ * según el estado del semáforo.
+ * 
+ * Los carriles A y B están controlados por el semáforo AB.
+ * Los carriles C y D están controlados por el semáforo CD.
+ * 
+ * @author : Jhoan Andres Villada - Juan Esteban Giraldo Betancur - Isabela Quintero Murillo
+ */
+
 public class ListaCarros extends Thread {
     private boolean semaforoABVerde = true;
     private boolean semaforoCDVerde = false;

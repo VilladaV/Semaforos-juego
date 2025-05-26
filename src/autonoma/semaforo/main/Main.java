@@ -32,6 +32,9 @@ public class Main extends JFrame {
         
         nivelDificultad = seleccion + 1;
         LisCarr = new ListaCarros(nivelDificultad);
+        LisCarr.setSemaforoABVerde(true);
+        LisCarr.setSemaforoCDVerde(false);
+        LisCarr.start();
         
         Interfaz interfaz = new Interfaz(nivelDificultad, LisCarr);
         add(interfaz);
