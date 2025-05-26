@@ -1,5 +1,6 @@
 package autonoma.semaforo.gui;
 
+import autonoma.semaforo.models.Carro;
 import java.awt.*;
 import javax.swing.*;
 
@@ -44,11 +45,23 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
 
     private Timer timer;
     private ListaCarros logicaCarros;
+    private java.util.List<Carro> carros;
 
-    private final int SEMAFORO_X_PARADA_IZQ = 100;
-    private final int SEMAFORO_X_PARADA_DER = 300;
-    private final int SEMAFORO_Y_PARADA_ARRIBA = 150;
-    private final int SEMAFORO_Y_PARADA_ABAJO = 250;
+
+    private final int SEMAFORO_X_PARADA_IZQ = 400;
+    private final int SEMAFORO_X_PARADA_DER = 675;
+    private final int SEMAFORO_Y_PARADA_ARRIBA = 270;
+    private final int SEMAFORO_Y_PARADA_ABAJO = 520;
+    
+    private boolean x1PasoSemaforo = false;
+    private boolean x2PasoSemaforo = false;
+    private boolean xi1PasoSemaforo = false;
+    private boolean xi2PasoSemaforo = false;
+    private boolean y1PasoSemaforo = false;
+    private boolean y2PasoSemaforo = false;
+    private boolean ya1PasoSemaforo = false;
+    private boolean ya2PasoSemaforo = false;
+
 
     public Interfaz() {
         setFocusable(true);
@@ -64,6 +77,25 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
         image_icon7 = new ImageIcon(this.getClass().getResource(carroy2));
         image_icon8 = new ImageIcon(this.getClass().getResource(carroya1));
         image_icon9 = new ImageIcon(this.getClass().getResource(carroya2));
+        
+        carros = new java.util.ArrayList<>();
+
+        // Carril D (izquierda a derecha)
+        carros.add(new Carro(-100, 380, Carro.Direccion.HORIZONTAL, Carro.Sentido.POSITIVO, image_icon2, SEMAFORO_X_PARADA_IZQ, "D"));
+        carros.add(new Carro(-200, 425, Carro.Direccion.HORIZONTAL, Carro.Sentido.POSITIVO, image_icon3, SEMAFORO_X_PARADA_IZQ, "D"));
+
+        // Carril C (derecha a izquierda)
+        carros.add(new Carro(1080 + 100, 325, Carro.Direccion.HORIZONTAL, Carro.Sentido.NEGATIVO, image_icon4, SEMAFORO_X_PARADA_DER, "C"));
+        carros.add(new Carro(1080 + 200, 365, Carro.Direccion.HORIZONTAL, Carro.Sentido.NEGATIVO, image_icon5, SEMAFORO_X_PARADA_DER, "C"));
+
+        // Carril A (arriba hacia abajo)
+        carros.add(new Carro(454, -100, Carro.Direccion.VERTICAL, Carro.Sentido.POSITIVO, image_icon6, SEMAFORO_Y_PARADA_ARRIBA, "A"));
+        carros.add(new Carro(494, -200, Carro.Direccion.VERTICAL, Carro.Sentido.POSITIVO, image_icon7, SEMAFORO_Y_PARADA_ARRIBA, "A"));
+
+        // Carril B (abajo hacia arriba)
+        carros.add(new Carro(555, 720 + 100, Carro.Direccion.VERTICAL, Carro.Sentido.NEGATIVO, image_icon8, SEMAFORO_Y_PARADA_ABAJO, "B"));
+        carros.add(new Carro(518, 720 + 200, Carro.Direccion.VERTICAL, Carro.Sentido.NEGATIVO, image_icon9, SEMAFORO_Y_PARADA_ABAJO, "B"));
+
 
         x1 = -100;
         x2 = -200;
@@ -86,50 +118,28 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
         requestFocusInWindow();
     }
 
-    @Override
+@Override
 public void actionPerformed(ActionEvent e) {
-    // CARRIL D (izquierda a derecha)
-    if (logicaCarros.isCarrilDMoviendose() || x1 + image_icon2.getIconWidth() < SEMAFORO_X_PARADA_IZQ) {
-        x1++;
-    }
-    if (logicaCarros.isCarrilDMoviendose() || x2 + image_icon3.getIconWidth() < SEMAFORO_X_PARADA_IZQ) {
-        x2++;
-    }
-    if (x1 > getWidth()) x1 = -image_icon2.getIconWidth();
-    if (x2 > getWidth()) x2 = -image_icon3.getIconWidth();
+for (Carro carro : carros) {
+    boolean semaforoVerde = false;
 
-    // CARRIL C (derecha a izquierda)
-    if (logicaCarros.isCarrilCMoviendose() || xi1 > SEMAFORO_X_PARADA_DER) {
-        xi1--;
+    switch (carro.getCarril()) {
+        case "A" -> semaforoVerde = logicaCarros.isCarrilAMoviendose();
+        case "B" -> semaforoVerde = logicaCarros.isCarrilBMoviendose();
+        case "C" -> semaforoVerde = logicaCarros.isCarrilCMoviendose();
+        case "D" -> semaforoVerde = logicaCarros.isCarrilDMoviendose();
     }
-    if (logicaCarros.isCarrilCMoviendose() || xi2 > SEMAFORO_X_PARADA_DER) {
-        xi2--;
-    }
-    if (xi1 < -image_icon4.getIconWidth()) xi1 = getWidth();
-    if (xi2 < -image_icon5.getIconWidth()) xi2 = getWidth();
 
-    // CARRIL A (arriba hacia abajo)
-    if (logicaCarros.isCarrilAMoviendose() || y1 + image_icon6.getIconHeight() < SEMAFORO_Y_PARADA_ARRIBA) {
-        y1++;
-    }
-    if (logicaCarros.isCarrilAMoviendose() || y2 + image_icon7.getIconHeight() < SEMAFORO_Y_PARADA_ARRIBA) {
-        y2++;
-    }
-    if (y1 > getHeight()) y1 = -image_icon6.getIconHeight();
-    if (y2 > getHeight()) y2 = -image_icon7.getIconHeight();
-
-    // CARRIL B (abajo hacia arriba)
-    if (logicaCarros.isCarrilBMoviendose() || ya1 > SEMAFORO_Y_PARADA_ABAJO) {
-        ya1--;
-    }
-    if (logicaCarros.isCarrilBMoviendose() || ya2 > SEMAFORO_Y_PARADA_ABAJO) {
-        ya2--;
-    }
-    if (ya1 < -image_icon8.getIconHeight()) ya1 = getHeight();
-    if (ya2 < -image_icon9.getIconHeight()) ya2 = getHeight();
-
-    repaint();
+    carro.mover(semaforoVerde);
+    carro.reiniciarSiSale(getWidth(), getHeight());
 }
+
+
+repaint();
+}
+
+
+
 
     @Override
     public void paintComponent(Graphics g) {
@@ -138,14 +148,9 @@ public void actionPerformed(ActionEvent e) {
 
         g2d.drawImage(image_icon1.getImage(), 0, 0, this);
 
-        g2d.drawImage(image_icon2.getImage(), x1, 380, this);
-        g2d.drawImage(image_icon3.getImage(), x2, 425, this);
-        g2d.drawImage(image_icon4.getImage(), xi1, 325, this);
-        g2d.drawImage(image_icon5.getImage(), xi2, 365, this);
-        g2d.drawImage(image_icon6.getImage(), 454, y1, this);
-        g2d.drawImage(image_icon7.getImage(), 494, y2, this);
-        g2d.drawImage(image_icon8.getImage(), 555, ya1, this);
-        g2d.drawImage(image_icon9.getImage(), 518, ya2, this);
+        for (Carro carro : carros) {
+    g2d.drawImage(carro.getImagen().getImage(), carro.getX(), carro.getY(), this);
+}
 
         // Mostrar texto en pantalla
         g2d.setColor(Color.WHITE);
