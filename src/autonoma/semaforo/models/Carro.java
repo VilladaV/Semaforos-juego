@@ -203,7 +203,7 @@ private boolean estaEnSemaforo() {
                 y = (sentido == Sentido.POSITIVO) ? -imagen.getIconHeight() : alto;
                 haPasadoSemaforo = false;
             }
-        }
+        } 
     }
 
     public Rectangle getBounds() {
