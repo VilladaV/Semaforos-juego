@@ -222,3 +222,4 @@ private boolean estaEnSemaforo() {
     public ImageIcon getImagen() { return imagen; }
     public String getCarril() { return carril; }
 }
+
