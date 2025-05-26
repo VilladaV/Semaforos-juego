@@ -64,7 +64,9 @@ public class MenuPrincipal extends JFrame {
                 ListaCarros lisCarr = new ListaCarros(nivelSeleccionado);
                 lisCarr.start();
                 JFrame juego = new JFrame("Simulador de Tráfico");
-                juego.add(new Interfaz(nivelSeleccionado, lisCarr));
+                juego.add(new autonoma.semaforo.gui.Interfaz(nivelSeleccionado, lisCarr) {
+                    // implementamos la clase abstracta como anónima
+                });
                 juego.setSize(1080, 720);
                 juego.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 juego.setLocationRelativeTo(null);
@@ -82,4 +84,3 @@ public class MenuPrincipal extends JFrame {
         SwingUtilities.invokeLater(MenuPrincipal::new);
     }
 }
-  

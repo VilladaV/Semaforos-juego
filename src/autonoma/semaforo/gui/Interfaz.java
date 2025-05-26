@@ -30,7 +30,7 @@ import java.util.Scanner;
  * @author: Jhoan Andres Villada - Juan Esteban Giraldo Betancur - Isabela Quintero Murillo
  */
 
-public class Interfaz extends JPanel implements ActionListener, KeyListener {
+public abstract class Interfaz extends JPanel implements ActionListener, KeyListener {
      // Imágenes de fondo y carros
     private ImageIcon image_icon1;
     private ImageIcon image_icon2, image_icon3, image_icon4, image_icon5, image_icon6, image_icon7, image_icon8, image_icon9;
@@ -79,15 +79,16 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
     }
     // Carga de imágenes
     private void configurarImagenes() {
-        image_icon1 = new ImageIcon(getClass().getResource("imagenes/crucero.png"));
-        image_icon2 = new ImageIcon(getClass().getResource("imagenes/carrox1.png"));
-        image_icon3 = new ImageIcon(getClass().getResource("imagenes/carrox2.png"));
-        image_icon4 = new ImageIcon(getClass().getResource("imagenes/carroxi1.png"));
-        image_icon5 = new ImageIcon(getClass().getResource("imagenes/carroxi2.png"));
-        image_icon6 = new ImageIcon(getClass().getResource("imagenes/carroy1.png"));
-        image_icon7 = new ImageIcon(getClass().getResource("imagenes/carroy2.png"));
-        image_icon8 = new ImageIcon(getClass().getResource("imagenes/carroya1.png"));
-        image_icon9 = new ImageIcon(getClass().getResource("imagenes/carroya2.png"));
+        image_icon1 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/crucero.png"));
+image_icon2 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carrox1.png"));
+image_icon3 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carrox2.png"));
+image_icon4 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroxi1.png"));
+image_icon5 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroxi2.png"));
+image_icon6 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroy1.png"));
+image_icon7 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroy2.png"));
+image_icon8 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroya1.png"));
+image_icon9 = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/carroya2.png"));
+
     }
 
     private void configurarTemporizadores() {
@@ -354,17 +355,17 @@ public void keyPressed(KeyEvent e) {
     }
     repaint(); // Forzar redibujado inmediato
 }
-
+    
 
     @Override
     public void keyReleased(KeyEvent e) {}
     @Override
     public void keyTyped(KeyEvent e) {}
-<<<<<<< HEAD
+
     
 }
-=======
-}
+    
+   
 
   
->>>>>>> 44fa4d6ef38b67def31ae0a715e9fa18892d95f9
+
