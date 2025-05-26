@@ -4,38 +4,51 @@
  */
 package autonoma.semaforo.main;
 
-/**
- *
- * @author johan villada yu camila prada 
- * version 1.0.0
- * 3/24/25
- */
 import autonoma.semaforo.gui.Interfaz;
 import autonoma.semaforo.models.ListaCarros;
-import java.awt.BorderLayout;
 import javax.swing.*;
+import java.awt.*;
 
 public class Main extends JFrame {
     public static ListaCarros LisCarr;
+    private static int nivelDificultad = 1;
 
     public Main() {
-        Interfaz interfaz = new Interfaz();
+        Object[] opciones = {"Fácil", "Medio", "Difícil"};
+        int seleccion = JOptionPane.showOptionDialog(
+            null,
+            "Seleccione el nivel de dificultad:",
+            "Configuración de juego",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            opciones,
+            opciones[0]
+        );
+        
+        if(seleccion == JOptionPane.CLOSED_OPTION) {
+            System.exit(0);
+        }
+        
+        nivelDificultad = seleccion + 1;
+        LisCarr = new ListaCarros(nivelDificultad);
+        
+        Interfaz interfaz = new Interfaz(nivelDificultad, LisCarr);
         add(interfaz);
-        JPanel panel = new JPanel();
-
-        add(panel, BorderLayout.SOUTH);
-
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1080, 720);
         setLocationRelativeTo(null);
-        setTitle("Practica 1");
+        setTitle("Simulador de Tráfico - Nivel " + (nivelDificultad == 1 ? "Fácil" : nivelDificultad == 2 ? "Medio" : "Difícil"));
         setResizable(false);
         setVisible(true);
     }
 
     public static void main(String[] args) {
-        LisCarr = new ListaCarros();
-        new Main();
-        LisCarr.start();
+        SwingUtilities.invokeLater(() -> new Main());
+    }
+    
+    public static int getNivelDificultad() {
+        return nivelDificultad;
     }
 }

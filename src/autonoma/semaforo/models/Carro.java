@@ -5,6 +5,8 @@
 package autonoma.semaforo.models;
 
 import javax.swing.ImageIcon;
+import java.awt.Rectangle;
+import java.util.List;
 
 public class Carro {
     public enum Direccion { HORIZONTAL, VERTICAL }
@@ -16,9 +18,10 @@ public class Carro {
     private final ImageIcon imagen;
     private final int puntoParada;
     private boolean haPasadoSemaforo;
-    private final String carril; // A, B, C o D
+    private final String carril;
 
-    public Carro(int x, int y, Direccion direccion, Sentido sentido, ImageIcon imagen, int puntoParada, String carril) {
+    public Carro(int x, int y, Direccion direccion, Sentido sentido, 
+                ImageIcon imagen, int puntoParada, String carril) {
         this.x = x;
         this.y = y;
         this.direccion = direccion;
@@ -29,96 +32,133 @@ public class Carro {
         this.carril = carril;
     }
 
-   public void mover(boolean semaforoEnVerde) {
-    // Determinar la posición del "frente" del carro
-    int frente;
-    int tamanoCarro;
-
-    if (direccion == Direccion.HORIZONTAL) {
-        tamanoCarro = imagen.getIconWidth();
-        frente = (sentido == Sentido.POSITIVO) ? x + tamanoCarro : x;
-    } else { // Direccion.VERTICAL
-        tamanoCarro = imagen.getIconHeight();
-        frente = (sentido == Sentido.POSITIVO) ? y + tamanoCarro : y;
-    }
-
-    boolean estaCercaSemaforo = false;
-    // Un margen para considerar que el carro está "cerca" del semáforo
-    // y debe empezar a considerar su estado.
-    // Podría ser un poco antes del punto de parada y hasta un poco después de él.
-    int margenSemaforo = 10; // Por ejemplo, 10 píxeles antes y después del punto de parada
-
-    if (direccion == Direccion.HORIZONTAL) {
-        if (sentido == Sentido.POSITIVO) { // Carril D (izquierda a derecha)
-            estaCercaSemaforo = (frente >= puntoParada - margenSemaforo && x < puntoParada + tamanoCarro + margenSemaforo);
-        } else { // Carril C (derecha a izquierda)
-            estaCercaSemaforo = (frente <= puntoParada + margenSemaforo && x > puntoParada - tamanoCarro - margenSemaforo);
-        }
-    } else { // Direccion.VERTICAL
-        if (sentido == Sentido.POSITIVO) { // Carril A (arriba a abajo)
-            estaCercaSemaforo = (frente >= puntoParada - margenSemaforo && y < puntoParada + tamanoCarro + margenSemaforo);
-        } else { // Carril B (abajo a arriba)
-            estaCercaSemaforo = (frente <= puntoParada + margenSemaforo && y > puntoParada - tamanoCarro - margenSemaforo);
+    public void mover(boolean semaforoEnVerde, List<Carro> todosLosCarros) {
+    // 1. Verificar si hay carro delante muy cerca (para evitar colisiones)
+    boolean carroDelanteCerca = false;
+    int distanciaSeguridad = 30; // Pixeles de separación mínima
+    
+    for(Carro otro : todosLosCarros) {
+        if(otro != this && mismoCarrilYDireccion(otro)) {
+            int distancia = calcularDistanciaCon(otro);
+            
+            if(distancia < distanciaSeguridad && distancia > 0) {
+                carroDelanteCerca = true;
+                break;
+            }
         }
     }
-
-    // Lógica para decidir si el carro se mueve
-    // 1. Si el semáforo está en verde, ¡adelante!
-    // 2. Si ya pasó el semáforo (haPasadoSemaforo es true), también ¡adelante!
-    // 3. Si no está cerca del semáforo (ni ha llegado ni lo ha pasado completamente), también ¡adelante!
-    // El carro solo para si NO está en verde Y NO ha pasado el semáforo Y SÍ está cerca del semáforo.
-    boolean debeMover = false;
-
-    if (semaforoEnVerde) {
-        debeMover = true;
-        // Si el semáforo está en verde y el carro está en la zona de parada,
-        // marcamos que ya lo ha pasado para que siga sin problemas
-        // incluso si el semáforo cambia a rojo después de que lo cruzó.
-        if (estaCercaSemaforo) { // Podría ser solo (frente > puntoParada) para ser más preciso.
-            haPasadoSemaforo = true;
+    
+    // 2. Solo mover si no hay carro muy cerca delante
+    if(!carroDelanteCerca) {
+        boolean debeMover = determinarMovimiento(semaforoEnVerde);
+        if(debeMover) {
+            if(direccion == Direccion.HORIZONTAL) {
+                x += (sentido == Sentido.POSITIVO) ? 1 : -1;
+            } else {
+                y += (sentido == Sentido.POSITIVO) ? 1 : -1;
+            }
         }
-    } else { // Semáforo en rojo
-        if (haPasadoSemaforo) {
-            // Si el semáforo está en rojo, pero el carro ya lo había pasado, ¡sigue!
-            debeMover = true;
+    }
+}
+    
+    private boolean mismoCarrilYDireccion(Carro otro) {
+    return this.carril.equals(otro.getCarril()) && 
+           this.direccion == otro.direccion && 
+           this.sentido == otro.sentido;
+}
+
+private int calcularDistanciaCon(Carro otro) {
+    if(direccion == Direccion.HORIZONTAL) {
+        if(sentido == Sentido.POSITIVO) {
+            return otro.getX() - (this.x + this.imagen.getIconWidth());
         } else {
-            // Si el semáforo está en rojo y NO ha pasado el semáforo
-            // (es decir, está antes o justo en el punto de parada), entonces debe parar.
-            // Para moverse, debe no estar cerca del semáforo (es decir, aún no ha llegado).
-            if (!estaCercaSemaforo) {
-                 debeMover = true;
+            return this.x - (otro.getX() + otro.getImagen().getIconWidth());
+        }
+    } else {
+        if(sentido == Sentido.POSITIVO) {
+            return otro.getY() - (this.y + this.imagen.getIconHeight());
+        } else {
+            return this.y - (otro.getY() + otro.getImagen().getIconHeight());
+        }
+    }
+}
+
+//    private int calcularDistancia(Carro otro) {
+//        if(direccion == Direccion.HORIZONTAL) {
+//            if(sentido == Sentido.POSITIVO && otro.getX() > this.x) {
+//                return otro.getX() - (this.x + this.imagen.getIconWidth());
+//            } else if(sentido == Sentido.NEGATIVO && otro.getX() < this.x) {
+//                return (this.x) - (otro.getX() + otro.getImagen().getIconWidth());
+//            }
+//        } else {
+//            if(sentido == Sentido.POSITIVO && otro.getY() > this.y) {
+//                return otro.getY() - (this.y + this.imagen.getIconHeight());
+//            } else if(sentido == Sentido.NEGATIVO && otro.getY() < this.y) {
+//                return (this.y) - (otro.getY() + otro.getImagen().getIconHeight());
+//            }
+//        }
+//        return Integer.MAX_VALUE;
+//    }
+
+    private boolean determinarMovimiento(boolean semaforoEnVerde) {
+        int frente = (direccion == Direccion.HORIZONTAL) ? 
+            (sentido == Sentido.POSITIVO ? x + imagen.getIconWidth() : x) :
+            (sentido == Sentido.POSITIVO ? y + imagen.getIconHeight() : y);
+
+        boolean estaCercaSemaforo = (direccion == Direccion.HORIZONTAL) ?
+            (sentido == Sentido.POSITIVO ? frente >= puntoParada - 10 && x < puntoParada + imagen.getIconWidth() + 10 :
+             frente <= puntoParada + 10 && x > puntoParada - imagen.getIconWidth() - 10) :
+            (sentido == Sentido.POSITIVO ? frente >= puntoParada - 10 && y < puntoParada + imagen.getIconHeight() + 10 :
+             frente <= puntoParada + 10 && y > puntoParada - imagen.getIconHeight() - 10);
+
+        if(semaforoEnVerde) {
+            if(estaCercaSemaforo) {
+                haPasadoSemaforo = true;
+            }
+            return true;
+        } else {
+            if(haPasadoSemaforo) {
+                return true;
+            } else {
+                return !estaCercaSemaforo;
             }
         }
     }
 
-    if (debeMover) {
-        if (direccion == Direccion.HORIZONTAL) {
-            x += (sentido == Sentido.POSITIVO) ? 1 : -1;
-        } else { // Direccion.VERTICAL
-            y += (sentido == Sentido.POSITIVO) ? 1 : -1;
-        }
+    public boolean estaDetenido() {
+        int frente = (direccion == Direccion.HORIZONTAL) ? 
+            (sentido == Sentido.POSITIVO ? x + imagen.getIconWidth() : x) :
+            (sentido == Sentido.POSITIVO ? y + imagen.getIconHeight() : y);
+
+        return !haPasadoSemaforo && 
+               ((direccion == Direccion.HORIZONTAL && 
+                 ((sentido == Sentido.POSITIVO && frente >= puntoParada - 5) ||
+                  (sentido == Sentido.NEGATIVO && frente <= puntoParada + 5))) ||
+               (direccion == Direccion.VERTICAL && 
+                 ((sentido == Sentido.POSITIVO && frente >= puntoParada - 5) ||
+                  (sentido == Sentido.NEGATIVO && frente <= puntoParada + 5))));
     }
 
-    // Aquí reseteamos haPasadoSemaforo cuando el carro sale de la vista,
-    // para que la próxima vez que aparezca, se comporte como si no hubiera pasado el semáforo aún.
-    // Esto ya lo tenías y es correcto.
-    // La lógica de reiniciarSiSale() ya se encarga de esto.
-}
-
-
-
     public void reiniciarSiSale(int ancho, int alto) {
-        if (direccion == Direccion.HORIZONTAL) {
-            if (x > ancho || x + imagen.getIconWidth() < 0) {
+        if(direccion == Direccion.HORIZONTAL) {
+            if(x > ancho || x + imagen.getIconWidth() < 0) {
                 x = (sentido == Sentido.POSITIVO) ? -imagen.getIconWidth() : ancho;
                 haPasadoSemaforo = false;
             }
         } else {
-            if (y > alto || y + imagen.getIconHeight() < 0) {
+            if(y > alto || y + imagen.getIconHeight() < 0) {
                 y = (sentido == Sentido.POSITIVO) ? -imagen.getIconHeight() : alto;
                 haPasadoSemaforo = false;
             }
         }
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, imagen.getIconWidth(), imagen.getIconHeight());
+    }
+
+    public boolean colisionaCon(Carro otro) {
+        return this.getBounds().intersects(otro.getBounds());
     }
 
     public int getX() { return x; }
