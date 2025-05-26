@@ -150,7 +150,7 @@ private int calcularDistanciaCon(Carro otro) {
                 y = (sentido == Sentido.POSITIVO) ? -imagen.getIconHeight() : alto;
                 haPasadoSemaforo = false;
             }
-        }
+        } 
     }
 
     public Rectangle getBounds() {
