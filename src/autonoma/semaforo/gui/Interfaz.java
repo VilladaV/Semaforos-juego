@@ -67,7 +67,7 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
     }
     // Carga de imágenes
     private void configurarImagenes() {
-        image_icon1 = new ImageIcon(getClass().getResource("imagenes/crucero2.jfif"));
+        image_icon1 = new ImageIcon(getClass().getResource("imagenes/crucero.png"));
         image_icon2 = new ImageIcon(getClass().getResource("imagenes/carrox1.png"));
         image_icon3 = new ImageIcon(getClass().getResource("imagenes/carrox2.png"));
         image_icon4 = new ImageIcon(getClass().getResource("imagenes/carroxi1.png"));
