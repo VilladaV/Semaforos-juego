@@ -213,6 +213,9 @@ private boolean estaEnSemaforo() {
     public boolean colisionaCon(Carro otro) {
         return this.getBounds().intersects(otro.getBounds());
     }
+    public Direccion getDireccion() {
+    return direccion;
+}
 
     public int getX() { return x; }
     public int getY() { return y; }
