@@ -1,9 +1,16 @@
 // Archivo: Interfaz.java
 package autonoma.semaforo.gui;
 
+import autonoma.semaforo.excepciones.AtropelloException;
 import autonoma.semaforo.excepciones.ChoqueException;
+import autonoma.semaforo.models.Arquitecto;
+import autonoma.semaforo.models.CampoDeBatalla;
 import autonoma.semaforo.models.Carro;
 import autonoma.semaforo.models.ListaCarros;
+import autonoma.semaforo.models.Personaje;
+import autonoma.semaforo.models.ProgramadorJunior;
+import autonoma.semaforo.models.Sonido;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -32,6 +39,14 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
     private int puntaje;
     private int mejorPuntaje;
     private Timer timerPuntaje;
+
+    private CampoDeBatalla campoPersonajes;
+    private Timer generadorPeatones;
+    private ImageIcon imgJunior, imgArquitecto;
+
+    private Sonido sonidoJuego;
+    private Sonido sonidoChoque;
+
     private static final String ARCHIVO_PUNTAJE = "mejor_puntaje.txt";
 
     public Interfaz(int nivelDificultad, ListaCarros logicaCarros) {
@@ -53,6 +68,25 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
         this.puntaje = 0;
         this.mejorPuntaje = cargarMejorPuntaje();
         iniciarTimerPuntaje();
+
+        campoPersonajes = new CampoDeBatalla();
+
+        imgJunior = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/programador1.png"));
+        imgArquitecto = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/arquitecto.png"));
+
+        generadorPeatones = new Timer(9000, e -> {
+            if (rand.nextBoolean()) {
+                campoPersonajes.agregarPersonaje(new ProgramadorJunior(imgJunior));
+            } else {
+                campoPersonajes.agregarPersonaje(new Arquitecto(imgArquitecto));
+            }
+        });
+        generadorPeatones.start();
+
+        sonidoJuego = new Sonido("/autonoma/semaforo/gui/sonidos/trafico.wav");
+        sonidoJuego.reproducirEnBucle();
+
+        sonidoChoque = new Sonido("/autonoma/semaforo/gui/sonidos/choque.wav");
     }
 
     private void configurarImagenes() {
@@ -112,6 +146,17 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+    private void verificarAtropellos() throws AtropelloException {
+        for (Carro carro : carros) {
+            Rectangle rCarro = carro.getBounds();
+            for (Personaje p : campoPersonajes.getPersonajes()) {
+                if (rCarro.intersects(p.getBounds())) {
+                    throw new AtropelloException(p.getClass().getSimpleName(), carro.getCarril());
+                }
+            }
+        }
+    }
+
     private boolean verificarColisionesEnCruce() throws ChoqueException {
         Rectangle areaCruce = new Rectangle(400, 270, 275, 250);
 
@@ -139,20 +184,26 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
 
         try {
             for (Carro carro : carros) {
-                boolean semaforoVerde = switch (carro.getCarril()) {
-                    case "A", "B" -> abVerde;
-                    case "C", "D" -> cdVerde;
-                    default -> false;
-                };
+                boolean semaforoVerde;
+
+                switch (carro.getCarril()) {
+                    case "A", "B" -> semaforoVerde = abVerde;
+                    case "C", "D" -> semaforoVerde = cdVerde;
+                    default -> semaforoVerde = false;
+                }
 
                 carro.mover(semaforoVerde, carros);
                 carro.reiniciarSiSale(getWidth(), getHeight());
             }
+
             verificarColisionesEnCruce();
-        } catch (ChoqueException ex) {
-            terminarJuego();
+            verificarAtropellos();
+
+        } catch (ChoqueException | AtropelloException ex) {
+            terminarJuegoConExcepcion(ex.getMessage());
         }
 
+        campoPersonajes.actualizar();
         repaint();
     }
 
@@ -182,6 +233,8 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
         timer.stop();
         generadorCarros.stop();
         timerPuntaje.stop();
+        sonidoJuego.detener();
+        sonidoChoque.reproducirUnaVez();
 
         if (puntaje > mejorPuntaje) {
             mejorPuntaje = puntaje;
@@ -190,6 +243,28 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
 
         JOptionPane.showMessageDialog(this, "¡Colisión!\nPuntaje: " + puntaje +
                 "\nMejor puntaje: " + mejorPuntaje, "Fin del juego", JOptionPane.ERROR_MESSAGE);
+
+        reiniciarJuego();
+    }
+
+    private void terminarJuegoConExcepcion(String mensaje) {
+        timer.stop();
+        generadorCarros.stop();
+        timerPuntaje.stop();
+        generadorPeatones.stop();
+        sonidoJuego.detener();
+        sonidoChoque.reproducirUnaVez();
+
+        if (puntaje > mejorPuntaje) {
+            mejorPuntaje = puntaje;
+            guardarMejorPuntaje();
+        }
+
+        JOptionPane.showMessageDialog(this,
+                mensaje + "\nPuntaje: " + puntaje +
+                "\nMejor puntaje: " + mejorPuntaje,
+                "Fin del juego",
+                JOptionPane.ERROR_MESSAGE);
 
         reiniciarJuego();
     }
@@ -223,6 +298,8 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
         g2d.drawString("Semáforo AB (A): " + (logicaCarros.isSemaforoABVerde() ? "Verde" : "Rojo"), 20, 30);
         g2d.drawString("Semáforo CD (C): " + (logicaCarros.isSemaforoCDVerde() ? "Verde" : "Rojo"), 20, 60);
         g2d.drawString("Nivel: " + (nivelDificultad == 3 ? "😈 Caos" : nivelDificultad == 2 ? "Medio" : "Fácil"), 20, 90);
+
+        campoPersonajes.dibujar(g);
     }
 
     private void dibujarSemaforo(Graphics2D g2d, int x, int y, boolean verde) {
@@ -234,8 +311,7 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
         g2d.fillOval(x + 5, y + 35, 20, 20);
     }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
+    @Override public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_A -> logicaCarros.setSemaforoABVerde(!logicaCarros.isSemaforoABVerde());
             case KeyEvent.VK_C -> logicaCarros.setSemaforoCDVerde(!logicaCarros.isSemaforoCDVerde());
