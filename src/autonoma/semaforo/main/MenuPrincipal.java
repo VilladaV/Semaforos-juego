@@ -23,7 +23,7 @@ import java.awt.*;
 public class MenuPrincipal extends JFrame {
     private int nivelSeleccionado = 0;
     private JButton btnIniciar;
-    private Sonido sonidoMenu;
+    private Sonido sonidoMenu; 
     
 
 
