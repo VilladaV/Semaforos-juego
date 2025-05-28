@@ -1,5 +1,9 @@
 package autonoma.semaforo.models;
 
+// * @author : Jhoan Andres Villada - Juan Esteban Giraldo Betancur - Isabela Quintero Murillo
+// * @since 27/05/25
+// * @version 1.0.0
+
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Iterator;

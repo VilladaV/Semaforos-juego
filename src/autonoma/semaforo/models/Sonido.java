@@ -4,6 +4,10 @@ import javax.sound.sampled.*;
 import java.io.IOException;
 import java.net.URL;
 
+// * @author : Jhoan Andres Villada - Juan Esteban Giraldo Betancur - Isabela Quintero Murillo
+// * @since 27/05/25
+// * @version 1.0.0
+
 public class Sonido {
     private Clip clip;
 

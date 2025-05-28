@@ -1,6 +1,10 @@
 // Archivo: Interfaz.java
 package autonoma.semaforo.gui;
 
+// * @author : Jhoan Andres Villada - Juan Esteban Giraldo Betancur - Isabela Quintero Murillo
+// * @since 26/05/25
+// * @version 1.0.0
+
 import autonoma.semaforo.excepciones.AtropelloException;
 import autonoma.semaforo.excepciones.ChoqueException;
 import autonoma.semaforo.models.Arquitecto;

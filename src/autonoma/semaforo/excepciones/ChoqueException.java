@@ -4,6 +4,10 @@
  */
 package autonoma.semaforo.excepciones;
 
+// * @author : Jhoan Andres Villada - Juan Esteban Giraldo Betancur - Isabela Quintero Murillo
+// * @since 26/05/25
+// * @version 1.0.0
+
 public class ChoqueException extends Exception {
     private final String carril1;
     private final String carril2;
