@@ -52,11 +52,10 @@ public class MenuPrincipal extends JFrame {
 
         // Panel de información con comandos del juego
         JTextArea info = new JTextArea();
-        info.setText("🚦 INSTRUCCIONES DE JUEGO 🚦\n" +
-                     "▶ A: Cambiar semáforo A/B\n" +
-                     "▶ C: Cambiar semáforo C/D\n" +
-                     "▶ R: Reiniciar juego\n" +
-                     "▶ Dificultad Difícil = Modo Caos\n" +
+        info.setText(" INSTRUCCIONES DE JUEGO \n" +
+                     " A: Cambiar semáforo A/B\n" +
+                     " C: Cambiar semáforo C/D\n" +
+                     " R: Reiniciar juego\n" +
                      "¡Evita colisiones y alcanza el mejor puntaje!");
         info.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
         info.setOpaque(false);
@@ -66,23 +65,23 @@ public class MenuPrincipal extends JFrame {
         fondoLabel.add(info);
 
         // Botón de dificultad
-        JButton btnDificultad = crearBoton("⚙️ Elegir Dificultad");
+        JButton btnDificultad = crearBoton("Elegir Dificultad");
         btnDificultad.setBounds(ancho / 2 - 100, alto - 180, 200, 40);
         fondoLabel.add(btnDificultad);
 
         // Botón de iniciar
-        btnIniciar = crearBoton("🚦 Iniciar Juego");
+        btnIniciar = crearBoton("Iniciar Juego");
         btnIniciar.setBounds(ancho / 2 - 100, alto - 130, 200, 40);
         btnIniciar.setEnabled(false);
         fondoLabel.add(btnIniciar);
 
         // Botón de salir
-        JButton btnSalir = crearBoton("❌ Salir");
+        JButton btnSalir = crearBoton("Salir");
         btnSalir.setBounds(ancho / 2 - 100, alto - 80, 200, 40);
         fondoLabel.add(btnSalir);
 
         btnDificultad.addActionListener(e -> {
-            Object[] opciones = {"Fácil", "Media", "Difícil"};
+            Object[] opciones = {"Facil", "Media", "Difícil"};
             int seleccion = JOptionPane.showOptionDialog(
                 this, "Selecciona el nivel de dificultad:",
                 "Nivel de dificultad", JOptionPane.DEFAULT_OPTION,
@@ -104,7 +103,7 @@ public class MenuPrincipal extends JFrame {
             } else {
                 ListaCarros lisCarr = new ListaCarros(nivelSeleccionado);
                 lisCarr.start();
-                JFrame juego = new JFrame("Simulador de Tráfico");
+                JFrame juego = new JFrame("Simulador de Trafico");
                 juego.add(new autonoma.semaforo.gui.Interfaz(nivelSeleccionado, lisCarr) {
                     private int tiempoTranscurrido = 0;
                     private Timer dificultadTimer = new Timer(10000, e2 -> {

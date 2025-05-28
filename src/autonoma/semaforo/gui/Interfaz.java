@@ -270,7 +270,7 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
             guardarMejorPuntaje();
         }
 
-        JOptionPane.showMessageDialog(this, "¡Colisión!\nPuntaje: " + puntaje +
+        JOptionPane.showMessageDialog(this, "¡Colision!\nPuntaje: " + puntaje +
                 "\nMejor puntaje: " + mejorPuntaje, "Fin del juego", JOptionPane.ERROR_MESSAGE);
 
         reiniciarJuego();
