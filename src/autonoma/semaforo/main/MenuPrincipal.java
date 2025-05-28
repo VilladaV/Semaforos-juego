@@ -52,7 +52,7 @@ public class MenuPrincipal extends JFrame {
 
         // Panel de información con comandos del juego
         JTextArea info = new JTextArea();
-        info.setText(" INSTRUCCIONES DE JUEGO \n" +
+        info.setText(" INSTRUCCIONES JUEGO \n" +
                      " A: Cambiar semáforo A/B\n" +
                      " C: Cambiar semáforo C/D\n" +
                      " R: Reiniciar juego\n" +
