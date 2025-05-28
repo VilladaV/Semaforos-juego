@@ -11,7 +11,15 @@ import autonoma.semaforo.models.Sonido;
 
 import javax.swing.*;
 import java.awt.*;
-  
+  /**
+ * Clase que representa el menú principal del simulador de tráfico.
+ * Permite seleccionar el nivel de dificultad, iniciar el juego o salir.
+ * También reproduce un sonido de fondo y muestra instrucciones básicas.
+ * 
+ * @author 
+ *     Juan Esteban - Isabela - Jhojan
+ */
+
 public class MenuPrincipal extends JFrame {
     private int nivelSeleccionado = 0;
     private JButton btnIniciar;
@@ -19,7 +27,9 @@ public class MenuPrincipal extends JFrame {
     
 
 
-
+ /**
+     * Constructor que inicializa todos los elementos gráficos del menú.
+     */
     public MenuPrincipal() {
         setTitle("Simulador de Tráfico - Menú");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -125,7 +135,12 @@ public class MenuPrincipal extends JFrame {
 
         setVisible(true);
     }
-
+/**
+     * Crea un botón personalizado con estilo.
+     * 
+     * @param texto Texto del botón.
+     * @return JButton estilizado.
+     */
     private JButton crearBoton(String texto) {
         JButton boton = new JButton(texto);
         boton.setFocusPainted(false);
@@ -146,7 +161,11 @@ public class MenuPrincipal extends JFrame {
 
         return boton;
     }
-
+ /**
+     * Método main alternativo para ejecutar directamente el menú.
+     * 
+     * @param args Argumentos de línea de comandos.
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(MenuPrincipal::new);
     }
