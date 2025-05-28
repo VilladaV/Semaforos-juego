@@ -71,8 +71,8 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
 
         campoPersonajes = new CampoDeBatalla();
 
-        imgJunior = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/programador1.png"));
-        imgArquitecto = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/arquitecto.png"));
+        imgJunior = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/Programador1.png"));
+        imgArquitecto = new ImageIcon(getClass().getResource("/autonoma/semaforo/gui/imagenes/Arquitecto.png"));
 
         generadorPeatones = new Timer(9000, e -> {
             if (rand.nextBoolean()) {
@@ -118,33 +118,46 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
 
     private void generarNuevoCarro() {
         int tipoCarro = rand.nextInt(4);
-        Carro nuevoCarro = null;
-        boolean posicionValida = false;
-        int intentos = 0;
+    Carro nuevoCarro = null;
+    boolean posicionValida = false;
+    int intentos = 0;
 
-        while (!posicionValida && intentos < 20) {
-            intentos++;
+    while (!posicionValida && intentos < 20) {
+        intentos++;
 
-            switch (tipoCarro) {
-                case 0 -> nuevoCarro = new Carro(-100 - rand.nextInt(200), 380 + rand.nextInt(50), Carro.Direccion.HORIZONTAL, Carro.Sentido.POSITIVO, rand.nextBoolean() ? image_icon2 : image_icon3, SEMAFORO_X_PARADA_IZQ, "D");
-                case 1 -> nuevoCarro = new Carro(1180, 325 + rand.nextInt(50), Carro.Direccion.HORIZONTAL, Carro.Sentido.NEGATIVO, rand.nextBoolean() ? image_icon4 : image_icon5, SEMAFORO_X_PARADA_DER, "C");
-                case 2 -> nuevoCarro = new Carro(454 + rand.nextInt(50), -100, Carro.Direccion.VERTICAL, Carro.Sentido.POSITIVO, rand.nextBoolean() ? image_icon6 : image_icon7, SEMAFORO_Y_PARADA_ARRIBA, "A");
-                case 3 -> nuevoCarro = new Carro(555 + rand.nextInt(50), 820, Carro.Direccion.VERTICAL, Carro.Sentido.NEGATIVO, rand.nextBoolean() ? image_icon8 : image_icon9, SEMAFORO_Y_PARADA_ABAJO, "B");
-            }
-
-            posicionValida = true;
-            for (Carro existente : carros) {
-                if (nuevoCarro != null && nuevoCarro.getBounds().intersects(existente.getBounds())) {
-                    posicionValida = false;
-                    break;
-                }
-            }
+        switch (tipoCarro) {
+            case 0 -> nuevoCarro = new Carro(-100 - rand.nextInt(200), 380 + rand.nextInt(50), 
+                Carro.Direccion.HORIZONTAL, Carro.Sentido.POSITIVO, 
+                rand.nextBoolean() ? image_icon2 : image_icon3, 
+                SEMAFORO_X_PARADA_IZQ, "D", nivelDificultad);
+            case 1 -> nuevoCarro = new Carro(1180, 325 + rand.nextInt(50), 
+                Carro.Direccion.HORIZONTAL, Carro.Sentido.NEGATIVO, 
+                rand.nextBoolean() ? image_icon4 : image_icon5, 
+                SEMAFORO_X_PARADA_DER, "C", nivelDificultad);
+            case 2 -> nuevoCarro = new Carro(454 + rand.nextInt(50), -100, 
+                Carro.Direccion.VERTICAL, Carro.Sentido.POSITIVO, 
+                rand.nextBoolean() ? image_icon6 : image_icon7, 
+                SEMAFORO_Y_PARADA_ARRIBA, "A", nivelDificultad);
+            case 3 -> nuevoCarro = new Carro(505 + rand.nextInt(50), 820, 
+                Carro.Direccion.VERTICAL, Carro.Sentido.NEGATIVO, 
+                rand.nextBoolean() ? image_icon8 : image_icon9, 
+                SEMAFORO_Y_PARADA_ABAJO, "B", nivelDificultad);
         }
 
-        if (posicionValida && nuevoCarro != null) {
-            carros.add(nuevoCarro);
+        posicionValida = true;
+        for (Carro existente : carros) {
+            if (nuevoCarro != null && nuevoCarro.getBounds().intersects(existente.getBounds())) {
+                posicionValida = false;
+                break;
+            }
         }
     }
+
+    if (posicionValida && nuevoCarro != null) {
+        carros.add(nuevoCarro);
+    }
+}
+    
 
     private void verificarAtropellos() throws AtropelloException {
         for (Carro carro : carros) {
@@ -284,7 +297,7 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.drawImage(image_icon1.getImage(), 0, 0, this);
-        dibujarSemaforo(g2d, 450, 250, logicaCarros.isSemaforoABVerde());
+        dibujarSemaforo(g2d, 400, 250, logicaCarros.isSemaforoABVerde());
         dibujarSemaforo(g2d, 650, 500, logicaCarros.isSemaforoCDVerde());
 
         for (Carro carro : carros) {

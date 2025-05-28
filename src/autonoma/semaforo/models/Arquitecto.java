@@ -6,7 +6,7 @@ import java.util.Random;
 public class Arquitecto extends Personaje {
 
     public Arquitecto(ImageIcon imagen) {
-        super(-50, 410 + new Random().nextInt(20), 1, Direccion.HORIZONTAL, imagen);
+        super(320, 410 + new Random().nextInt(20), 1, Direccion.HORIZONTAL, imagen);
     }
 }
    

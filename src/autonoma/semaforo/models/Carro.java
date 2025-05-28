@@ -7,6 +7,7 @@ package autonoma.semaforo.models;
 import javax.swing.ImageIcon;
 import java.awt.Rectangle;
 import java.util.List;
+import java.util.Random;
 
 public class Carro {
     public enum Direccion { HORIZONTAL, VERTICAL }
@@ -19,9 +20,12 @@ public class Carro {
     private final int puntoParada;
     private boolean haPasadoSemaforo;
     private final String carril;
+    private int velocidadBase;
+    private int velocidadActual;
+    private Random rand;
 
     public Carro(int x, int y, Direccion direccion, Sentido sentido, 
-                ImageIcon imagen, int puntoParada, String carril) {
+                ImageIcon imagen, int puntoParada, String carril, int nivelDificultad) {
         this.x = x;
         this.y = y;
         this.direccion = direccion;
@@ -30,53 +34,73 @@ public class Carro {
         this.puntoParada = puntoParada;
         this.haPasadoSemaforo = false;
         this.carril = carril;
+        this.rand = new Random();
+        this.velocidadBase = determinarVelocidadBase(nivelDificultad);
+        this.velocidadActual = calcularVelocidadActual();
+    }
+    
+    private int determinarVelocidadBase(int nivelDificultad) {
+        switch(nivelDificultad) {
+            case 1: return 1;  // Fácil
+            case 2: return 2;  // Medio
+            case 3: return 3;  // Difícil
+            default: return 1;
+        }
+    }
+
+    private int calcularVelocidadActual() {
+        // Variación aleatoria de ±1 respecto a la velocidad base
+        return Math.max(1, velocidadBase + rand.nextInt(3) - 1);
     }
 
     public void mover(boolean semaforoEnVerde, List<Carro> todosLosCarros) {
     // 1. Verificar si hay carro delante
     boolean carroDelante = false;
-    int distanciaMinima = 50; // Distancia de seguridad
-    
-    for(Carro otro : todosLosCarros) {
-        if(otro != this && mismoCarril(otro) && estaAdelante(otro)) {
-            int distancia = calcularDistancia(otro);
-            if(distancia < distanciaMinima) {
-                carroDelante = true;
-                break;
+        int distanciaMinima = 50;
+        
+        for(Carro otro : todosLosCarros) {
+            if(otro != this && mismoCarril(otro) && estaAdelante(otro)) {
+                int distancia = calcularDistancia(otro);
+                if(distancia < distanciaMinima) {
+                    carroDelante = true;
+                    break;
+                }
             }
         }
-    }
+        
+        
     
     // 2. Solo mover si no hay carro delante cerca
-    if(!carroDelante) {
-        boolean debeMover = false;
-        
-        // Lógica del semáforo
-        if(semaforoEnVerde) {
-            debeMover = true;
-            // Marcar que ya pasó el semáforo
-            if(estaEnSemaforo()) {
-                haPasadoSemaforo = true;
-            }
-        } else {
-            // Si el semáforo está en rojo
-            if(haPasadoSemaforo) {
-                debeMover = true; // Ya pasó, puede continuar
+            if(!carroDelante) {
+            boolean debeMover = false;
+            
+            if(semaforoEnVerde) {
+                debeMover = true;
+                if(estaEnSemaforo()) {
+                    haPasadoSemaforo = true;
+                }
             } else {
-                // Solo se mueve si no ha llegado al semáforo
-                debeMover = !estaEnSemaforo();
+                if(haPasadoSemaforo) {
+                    debeMover = true;
+                } else {
+                    debeMover = !estaEnSemaforo();
+                }
+            }
+            
+            if(debeMover) {
+                if(direccion == Direccion.HORIZONTAL) {
+                    x += (sentido == Sentido.POSITIVO) ? velocidadActual : -velocidadActual;
+                } else {
+                    y += (sentido == Sentido.POSITIVO) ? velocidadActual : -velocidadActual;
+                }
             }
         }
         
-        if(debeMover) {
-            if(direccion == Direccion.HORIZONTAL) {
-                x += (sentido == Sentido.POSITIVO) ? 1 : -1;
-            } else {
-                y += (sentido == Sentido.POSITIVO) ? 1 : -1;
-            }
+        // Pequeña probabilidad de cambiar la velocidad aleatoriamente
+        if(rand.nextInt(100) == 0) {
+            velocidadActual = calcularVelocidadActual();
         }
     }
-}
     
     private boolean mismoCarril(Carro otro) {
     return this.carril.equals(otro.getCarril());
