@@ -24,7 +24,14 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
-
+/**
+ * Clase que representa la interfaz gráfica del juego de semáforos.
+ * Gestiona la lógica de dibujo, control del tráfico, peatones, sonidos,
+ * puntuación y control de colisiones y atropellos.
+ * 
+ * @author 
+ *     Juan Esteban - Isabela - Jhojan
+ */
 public class Interfaz extends JPanel implements ActionListener, KeyListener {
     private ImageIcon image_icon1;
     private ImageIcon image_icon2, image_icon3, image_icon4, image_icon5, image_icon6, image_icon7, image_icon8, image_icon9;
@@ -52,7 +59,12 @@ public class Interfaz extends JPanel implements ActionListener, KeyListener {
     private Sonido sonidoChoque;
 
     private static final String ARCHIVO_PUNTAJE = "mejor_puntaje.txt";
-
+/**
+     * Constructor principal que configura la interfaz del juego.
+     * 
+     * @param nivelDificultad Nivel de dificultad seleccionado.
+     * @param logicaCarros    Lógica de control de semáforos y carriles.
+     */
     public Interfaz(int nivelDificultad, ListaCarros logicaCarros) {
         this.nivelDificultad = nivelDificultad;
         this.logicaCarros = logicaCarros;
