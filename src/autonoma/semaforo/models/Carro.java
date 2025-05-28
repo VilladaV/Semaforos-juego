@@ -12,7 +12,16 @@ import javax.swing.ImageIcon;
 import java.awt.Rectangle;
 import java.util.List;
 import java.util.Random;
-
+/**
+ * Clase que representa un carro dentro del simulador de tráfico.
+ * Contiene la lógica de movimiento según la dirección, sentido, semáforos y otros vehículos.
+ * 
+ * Los carros pueden moverse en sentido horizontal o vertical y obedecen a los semáforos.
+ * También detectan colisiones con otros carros y reinician su posición al salir de la pantalla.
+ * 
+ * @author 
+ *     Juan Esteban - Isabela - Jhojan
+ */
 public class Carro {
     public enum Direccion { HORIZONTAL, VERTICAL }
     public enum Sentido { POSITIVO, NEGATIVO }
@@ -27,7 +36,17 @@ public class Carro {
     private int velocidadBase;
     private int velocidadActual;
     private Random rand;
-
+/**
+     * Constructor de la clase Carro.
+     *
+     * @param x            Posición horizontal inicial.
+     * @param y            Posición vertical inicial.
+     * @param direccion    Dirección en la que se mueve el carro.
+     * @param sentido      Sentido del movimiento (positivo o negativo).
+     * @param imagen       Imagen gráfica del carro.
+     * @param puntoParada  Coordenada del semáforo donde debe detenerse.
+     * @param carril       Identificador del carril por el que transita.
+     */
     public Carro(int x, int y, Direccion direccion, Sentido sentido, 
                 ImageIcon imagen, int puntoParada, String carril, int nivelDificultad) {
         this.x = x;
@@ -56,7 +75,13 @@ public class Carro {
         // Variación aleatoria de ±1 respecto a la velocidad base
         return Math.max(1, velocidadBase + rand.nextInt(3) - 1);
     }
-
+/**
+     * Mueve el carro si el semáforo está en verde o si ya pasó el semáforo.
+     * También verifica si hay carros adelante para mantener distancia de seguridad.
+     * 
+     * @param semaforoEnVerde     Indica si el semáforo correspondiente está en verde.
+     * @param todosLosCarros      Lista de todos los carros en la simulación.
+     */
     public void mover(boolean semaforoEnVerde, List<Carro> todosLosCarros) {
     // 1. Verificar si hay carro delante
     boolean carroDelante = false;
@@ -205,7 +230,11 @@ private boolean estaEnSemaforo() {
 //            }
 //        }
 //    }
-
+/**
+     * Verifica si el carro está detenido frente al semáforo.
+     * 
+     * @return true si está detenido, false si no.
+     */
     public boolean estaDetenido() {
         int frente = (direccion == Direccion.HORIZONTAL) ? 
             (sentido == Sentido.POSITIVO ? x + imagen.getIconWidth() : x) :
@@ -219,7 +248,12 @@ private boolean estaEnSemaforo() {
                  ((sentido == Sentido.POSITIVO && frente >= puntoParada - 5) ||
                   (sentido == Sentido.NEGATIVO && frente <= puntoParada + 5))));
     }
-
+   /**
+     * Reinicia la posición del carro si este sale fuera de la pantalla.
+     * 
+     * @param ancho Ancho de la ventana del juego.
+     * @param alto  Alto de la ventana del juego.
+     */
     public void reiniciarSiSale(int ancho, int alto) {
         if(direccion == Direccion.HORIZONTAL) {
             if(x > ancho || x + imagen.getIconWidth() < 0) {
@@ -233,11 +267,20 @@ private boolean estaEnSemaforo() {
             }
         } 
     }
-
+   /**
+     * Obtiene los límites del carro para verificar colisiones.
+     * 
+     * @return Un objeto Rectangle con las dimensiones del carro.
+     */
     public Rectangle getBounds() {
         return new Rectangle(x, y, imagen.getIconWidth(), imagen.getIconHeight());
     }
-
+ /**
+     * Verifica si el carro colisiona con otro carro.
+     * 
+     * @param otro El otro carro.
+     * @return true si hay colisión, false si no.
+     */
     public boolean colisionaCon(Carro otro) {
         return this.getBounds().intersects(otro.getBounds());
     }
