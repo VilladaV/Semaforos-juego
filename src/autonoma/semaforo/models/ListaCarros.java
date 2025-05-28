@@ -9,6 +9,8 @@ package autonoma.semaforo.models;
  * Los carriles C y D están controlados por el semáforo CD.
  * 
  * @author : Jhoan Andres Villada - Juan Esteban Giraldo Betancur - Isabela Quintero Murillo
+ * @since 26/05/25
+ * @version 1.0.0
  */
 
 public class ListaCarros extends Thread {

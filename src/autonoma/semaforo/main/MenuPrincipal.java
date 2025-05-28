@@ -1,6 +1,10 @@
 // Archivo: MenuPrincipal.java
 package autonoma.semaforo.main;
 
+// * @author : Jhoan Andres Villada - Juan Esteban Giraldo Betancur - Isabela Quintero Murillo
+// * @since 27/05/25
+// * @version 1.0.0
+
 import autonoma.semaforo.gui.Interfaz;
 import autonoma.semaforo.models.ListaCarros;
 import autonoma.semaforo.models.Sonido;

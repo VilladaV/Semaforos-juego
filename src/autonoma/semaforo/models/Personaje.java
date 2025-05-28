@@ -4,6 +4,10 @@ import javax.swing.ImageIcon;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
+// * @author : Jhoan Andres Villada - Juan Esteban Giraldo Betancur - Isabela Quintero Murillo
+// * @since 27/05/25
+// * @version 1.0.0
+
 public class Personaje {
     protected int x, y;
     protected int velocidad;
