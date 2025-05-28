@@ -4,13 +4,25 @@ import javax.sound.sampled.*;
 import java.io.IOException;
 import java.net.URL;
 
-// * @author : Jhoan Andres Villada - Juan Esteban Giraldo Betancur - Isabela Quintero Murillo
-// * @since 27/05/25
-// * @version 1.0.0
-
+/**
+ * Clase encargada de reproducir sonidos dentro del simulador de tráfico.
+ * Permite reproducir sonidos una sola vez o en bucle, así como detenerlos.
+ * Utiliza la API de sonido de Java (javax.sound.sampled).
+ * 
+ * Esta clase se utiliza para efectos como el sonido de ciudad o de colisión.
+ * 
+ * @author 
+ *     Juan Esteban - Isabela - Jhojan
+ */
 public class Sonido {
+
     private Clip clip;
 
+    /**
+     * Constructor que carga el sonido desde la ruta proporcionada.
+     * 
+     * @param ruta Ruta relativa del archivo de sonido dentro del proyecto.
+     */
     public Sonido(String ruta) {
         try {
             URL url = getClass().getResource(ruta);
@@ -22,6 +34,9 @@ public class Sonido {
         }
     }
 
+    /**
+     * Reproduce el sonido una sola vez desde el inicio.
+     */
     public void reproducirUnaVez() {
         if (clip != null) {
             clip.setFramePosition(0);
@@ -29,16 +44,21 @@ public class Sonido {
         }
     }
 
+    /**
+     * Reproduce el sonido en bucle indefinidamente.
+     */
     public void reproducirEnBucle() {
         if (clip != null) {
             clip.loop(Clip.LOOP_CONTINUOUSLY);
         }
     }
 
+    /**
+     * Detiene la reproducción del sonido actual.
+     */
     public void detener() {
         if (clip != null) {
             clip.stop();
         }
     }
 }
-
