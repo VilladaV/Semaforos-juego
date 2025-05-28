@@ -11,6 +11,8 @@ import autonoma.semaforo.models.Sonido;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
   /**
  * Clase que representa el menú principal del simulador de tráfico.
  * Permite seleccionar el nivel de dificultad, iniciar el juego o salir.
@@ -50,19 +52,41 @@ public class MenuPrincipal extends JFrame {
         sonidoMenu.reproducirEnBucle();
 
 
-        // Panel de información con comandos del juego
-        JTextArea info = new JTextArea();
-        info.setText(" INSTRUCCIONES JUEGO \n" +
-                     " A: Cambiar semáforo A/B\n" +
-                     " C: Cambiar semáforo C/D\n" +
-                     " R: Reiniciar juego\n" +
-                     "¡Evita colisiones y alcanza el mejor puntaje!");
-        info.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
-        info.setOpaque(false);
-        info.setEditable(false);
-        info.setForeground(new Color(255, 255, 255));
-        info.setBounds(20, 20, 450, 150);
-        fondoLabel.add(info);
+        try {
+    // Cargar la fuente personalizada para el título
+    Font blackOps = Font.createFont(Font.TRUETYPE_FONT, new File("BlackOpsOne-Regular.ttf")).deriveFont(28f);
+    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    ge.registerFont(blackOps);
+
+    // JLabel para el título con fuente especial
+    JLabel titulo = new JLabel("Traffic light");
+    titulo.setFont(blackOps);
+    titulo.setForeground(Color.WHITE);
+    titulo.setBounds(20, 5, 450, 40); // Ajusta posición y tamaño si es necesario
+
+    fondoLabel.add(titulo); // Agrega el título por separado
+
+    // JTextArea con las instrucciones
+    JTextArea info = new JTextArea(
+        "INSTRUCCIONES JUEGO\n" +
+        "A: Cambiar semáforo A/B\n" +
+        "C: Cambiar semáforo C/D\n" +
+        "R: Reiniciar juego\n" +
+        "¡Evita colisiones y alcanza el mejor puntaje!"
+    );
+    info.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
+    info.setOpaque(false);
+    info.setEditable(false);
+    info.setFocusable(false);
+    info.setForeground(Color.WHITE);
+    info.setBounds(20, 50, 450, 150); // Posiciona debajo del título
+
+    fondoLabel.add(info);
+
+} catch (FontFormatException | IOException e) {
+    e.printStackTrace();
+} 
+
 
         // Botón de dificultad
         JButton btnDificultad = crearBoton("Elegir Dificultad");
